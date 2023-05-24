@@ -1,0 +1,4 @@
+# yaml
+settings:
+  proton_data_dir: 'O:\poltar\HallB\RGC\data-p'
+  deuteron_data_dir: 'O:\poltar\HallB\RGC\data-d'

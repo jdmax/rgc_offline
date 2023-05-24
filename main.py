@@ -10,23 +10,10 @@ from app.gui import MainWindow
 def main():
     '''Main executable calls main gui
     '''
-    config_file = 'pynmr_config.yaml'
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hc:")
-    except getopt.GetoptError:
-        print('Error: main.py [-c <config_file>]')
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ['-h', ]:
-            print('Usage: main.py [-c <config_file>]')
-            sys.exit()
-        elif opt in ['-c', ]:
-            config_file = arg
-
     app = QtWidgets.QApplication([])
     # app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) #enable highdpi scaling
-    app.setApplicationName("JLab Polarization Display")
-    gui = MainWindow(config_file)
+    app.setApplicationName("Run Group C Offline Polarization")
+    gui = MainWindow()
     gui.show()
     app.exec_()
 
