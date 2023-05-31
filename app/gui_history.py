@@ -3,6 +3,7 @@
 import datetime
 import glob
 import json
+import re
 import numpy as np
 from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QHBoxLayout, QVBoxLayout, QGridLayout, QLineEdit, QSpacerItem, \
     QTableView, QAbstractItemView, QAbstractScrollArea, QStackedWidget, QDoubleSpinBox, QDateTimeEdit, QPushButton
@@ -99,16 +100,19 @@ class HistTab(QWidget):
         '''
         self.start = self.start_dedit.dateTime().toPyDateTime()
         self.end = self.end_dedit.dateTime().toPyDateTime()
-        self.all_files = glob.glob(f"{self.parent.settings['proton_data_dir']}/*.txt")
+        self.all_files = glob.glob(f"{self.parent.settings['proton_data_dir']}/*.txt") \
+                         + glob.glob(f"{self.parent.settings['deuteron_data_dir']}/*.txt")
         self.current_time = datetime.datetime.strptime('Jan 1 2000  12:00AM', '%b %d %Y %I:%M%p')
         self.included = []
         for file in self.all_files:
-            name = file.replace(self.parent.settings['proton_data_dir'] + '\\', '')
-            if 'current' in name or 'baseline' in name:
+            self.filename_regex = re.compile('(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
+            if 'current' in file or 'baseline' in file:
                 continue
             else:
-                start, stop = name.split('__')
-                stop = stop.replace('.txt', '')
+                m = self.filename_regex.search(file)
+                if not m: continue   # skip if we don't match the regex
+                start = m.groups()[0]
+                stop = m.groups()[1]
                 start_dt = datetime.datetime.strptime(start, "%Y-%m-%d_%H-%M-%S")
                 stop_dt = datetime.datetime.strptime(stop, "%Y-%m-%d_%H-%M-%S")
                 if self.start < start_dt < self.end or self.start < stop_dt < self.end:
