@@ -33,6 +33,9 @@ class HistTab(QWidget):
         self.sub2_pen = pg.mkPen(color=(0, 0, 150), width=2)
         self.sub3_pen = pg.mkPen(color=(0, 180, 0), width=2)
 
+        self.filename_regex = re.compile(
+            '(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
+
         self.main = QHBoxLayout()  # main layout
         self.setLayout(self.main)
 
@@ -105,7 +108,6 @@ class HistTab(QWidget):
         self.current_time = datetime.datetime.strptime('Jan 1 2000  12:00AM', '%b %d %Y %I:%M%p')
         self.included = []
         for file in self.all_files:
-            self.filename_regex = re.compile('(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
             if 'current' in file or 'baseline' in file:
                 continue
             else:
