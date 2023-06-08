@@ -127,7 +127,8 @@ class HistTab(QWidget):
                     event = json.loads(line)
                     s = event['stop_time']
                     line_stoptime = datetime.datetime.strptime(s[:26], '%Y-%m-%d %H:%M:%S.%f')
-                    utcstamp = str(event['stop_stamp'])
+                    #utcstamp = str(event['stop_stamp'])
+                    utcstamp =event['stop_stamp']
                     if self.start < line_stoptime < self.end and 'pol' in event:
                         self.all[utcstamp] = event    # full dictionary from datafile
 
@@ -151,6 +152,8 @@ class HistTab(QWidget):
             self.strip_plot.setData(graph_data)
         except KeyError:
             pass
+
+        self.parent.te_tab.update_events(self.all)
 
 
     def select_event(self, item):

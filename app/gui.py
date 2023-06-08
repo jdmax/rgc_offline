@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QErrorMessage, QTabWidget, QLabel, QWid
 
 #from app.event import Config, Scan, RunningScan, Event, Baseline, HistPoint, History
 from app.gui_history import HistTab
+from app.gui_te import TETab
 
 
 class MainWindow(QMainWindow):
@@ -32,6 +33,8 @@ class MainWindow(QMainWindow):
         # Make tabs
         self.hist_tab = HistTab(self)
         self.tab_widget.addTab(self.hist_tab, "History")
+        self.te_tab = TETab(self)
+        self.tab_widget.addTab(self.te_tab, "Calibration")
 
     def load_settings(self):
         '''Load settings from YAML config file'''
@@ -40,3 +43,9 @@ class MainWindow(QMainWindow):
            self.config_dict = yaml.load(f, Loader=yaml.FullLoader)
         self.settings = self.config_dict['settings']
         print(f"Loaded settings from config.yaml.")
+
+    def divider(self):
+        div = QLabel ('')
+        div.setStyleSheet ("QLabel {background-color: #eeeeee; padding: 0; margin: 0; border-bottom: 0 solid #eeeeee; border-top: 1 solid #eeeeee;}")
+        div.setMaximumHeight (2)
+        return div
