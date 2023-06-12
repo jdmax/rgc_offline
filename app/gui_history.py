@@ -128,14 +128,16 @@ class HistTab(QWidget):
                     s = event['stop_time']
                     line_stoptime = datetime.datetime.strptime(s[:26], '%Y-%m-%d %H:%M:%S.%f')
                     #utcstamp = str(event['stop_stamp'])
-                    utcstamp =event['stop_stamp']
+                    utcstamp = event['stop_stamp']
                     if self.start < line_stoptime < self.end and 'pol' in event:
                         self.all[utcstamp] = event    # full dictionary from datafile
+                        self.all[utcstamp]['stop_time'] = line_stoptime    # full dictionary from datafile
 
         self.event_model.removeRows(0, self.event_model.rowCount())
         for i, stamp in enumerate(self.all.keys()):
             try:
-                dt = parse(self.all[stamp]['stop_time'])
+                #dt = parse(self.all[stamp]['stop_time'])
+                dt = self.all[stamp]['stop_time']
                 time = dt.strftime("%H:%M:%S")
                 date = dt.strftime("%m/%d/%y")
                 self.event_model.setItem(i,0,QStandardItem(str(self.all[stamp]['stop_stamp'])))
@@ -162,7 +164,7 @@ class HistTab(QWidget):
     def update_event_plot(self, item):
         '''Update event plot.
         '''
-        stamp = self.event_model.data(self.event_model.index(item.row(), 0))
+        stamp = float(self.event_model.data(self.event_model.index(item.row(), 0)))
         freq_list = np.array(self.all[stamp]['freq_list'])
         phase = np.array(self.all[stamp]['phase'])
         sub = np.array(self.all[stamp]['basesub'])

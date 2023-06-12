@@ -26,6 +26,9 @@ class TETab(QWidget):
         self.fit1_pen = pg.mkPen(color=(0, 0, 150), width=1.5)
         self.zoom_pen = pg.mkPen(color=(0, 180, 0), width=1.5)
         self.fit2_pen = pg.mkPen(color=(0, 130, 0), width=1.5)
+        self.sub_pen = pg.mkPen(color=(220, 0, 0), width=2)
+        self.sub2_pen = pg.mkPen(color=(0, 0, 150), width=2)
+        self.sub3_pen = pg.mkPen(color=(0, 180, 0), width=2)
 
         self.main = QHBoxLayout()  # main layout
 
@@ -68,13 +71,14 @@ class TETab(QWidget):
         self.calc_box.layout().addWidget(self.fitselect_label)
 
         self.te_model = QStandardItemModel()
-        self.te_model.setHorizontalHeaderLabels(['Date/Time', 'Area', 'Temp (K)'])
+        self.te_model.setHorizontalHeaderLabels(['Timestamp','Date/Time', 'Area', 'Temp (K)'])
         self.te_table = QTableView()
         self.te_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.te_table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.te_table.resizeColumnsToContents()
         self.te_table.setModel(self.te_model)
         self.te_table.doubleClicked.connect(self.double_clicked)
+        self.te_table.clicked.connect(self.clicked)
         self.te_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.calc_box.layout().addWidget(self.te_table)
         self.te_but_lay = QHBoxLayout()
@@ -123,6 +127,16 @@ class TETab(QWidget):
         self.fit1_plot = self.time_wid.plot([], [], pen=self.fit1_pen)
         self.fit2_plot = self.zoom_wid.plot([], [], pen=self.fit2_pen)
 
+
+        self.sig_wid = pg.PlotWidget(title='Selected Signal')
+        self.sig_wid.showGrid(True, True)
+        self.raw_plot = self.sig_wid.plot([], [], pen=self.sub_pen, name='Raw')
+        self.sub_plot = self.sig_wid.plot([], [], pen=self.sub2_pen, name='Base Subtracted')
+        self.fin_plot = self.sig_wid.plot([], [], pen=self.sub3_pen, name='Fit Subtracted')
+        self.sig_wid.addLegend(offset=(0.5, 0))
+        self.right.addWidget(self.sig_wid)
+
+
         self.main.addLayout(self.right)
         self.setLayout(self.main)
 
@@ -164,20 +178,20 @@ class TETab(QWidget):
 
         self.te_model.setRowCount(0)  # empty table
         for i, stamp in enumerate(list(self.te_data[:, 0])):  # put data in table, hist_points keyed on timestamp
-            self.te_model.setItem(i, 0, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
-            self.te_model.setItem(i, 1, QStandardItem(f"{self.hist_points[stamp]['area']:.10f}"))
-            #self.te_model.setItem(i, 2, QStandardItem(
-            #    f"{self.hist_points[stamp].epics_reads[self.parent.settings['epics_settings']['epics_temp']]:.4f}"))
+            self.te_model.setItem(i, 0, QStandardItem(str(self.hist_points[stamp]['stop_stamp'])))
+            self.te_model.setItem(i, 1, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
+            self.te_model.setItem(i, 2, QStandardItem(f"{self.hist_points[stamp]['area']:.10f}"))
+            self.te_model.setItem(i, 3, QStandardItem(str(self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T'])))
 
     def double_clicked(self, item):
         '''Remove event from table when double clicked'''
         self.te_data = np.delete(self.te_data, item.row(), 0)
         self.te_model.setRowCount(0)  # empty table
         for i, stamp in enumerate(list(self.te_data[:, 0])):  # put data in table, hist_points keyed on timestamp
-            self.te_model.setItem(i, 0, QStandardItem(self.hist_points[stamp].dt.strftime("%H:%M:%S")))
-            self.te_model.setItem(i, 1, QStandardItem(str(self.hist_points[stamp].area)))
-            self.te_model.setItem(i, 2, QStandardItem(
-                str(self.hist_points[stamp].epics_reads[self.parent.settings['epics_settings']['epics_temp']])))
+            self.te_model.setItem(i, 0, QStandardItem(str(self.hist_points[stamp]['stop_stamp'])))
+            self.te_model.setItem(i, 1, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
+            self.te_model.setItem(i, 2, QStandardItem(str(self.hist_points[stamp]['area'])))
+            self.te_model.setItem(i, 3, QStandardItem(str(self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T'])))
 
     def update_events(self, events):
         self.hist_points = events
@@ -209,11 +223,23 @@ class TETab(QWidget):
         self.time_plot.setData(self.time_data)  # plot
         self.hist_points = {t: hist_data[t] for t in list(self.time_data[:, 0])}  # keyed on timestamp
 
+    def clicked(self, item):
+        '''Update signal plot.
+        '''
+        stamp = float(self.te_model.data(self.te_model.index(item.row(), 0)))
+        freq_list = np.array(self.hist_points[stamp]['freq_list'])
+        phase = np.array(self.hist_points[stamp]['phase'])
+        sub = np.array(self.hist_points[stamp]['basesub'])
+        fin = np.array(self.hist_points[stamp]['fitsub'])
+        self.raw_plot.setData(freq_list, phase - phase.max())
+        self.sub_plot.setData(freq_list, sub - sub.max())
+        self.fin_plot.setData(freq_list, fin)
+
     def take_te(self):
         '''Send points for TE to make TE object'''
         times, areas = self.te_data.T
         temps = np.fromiter(
-            (self.hist_points[k].epics_reads[self.parent.settings['epics_settings']['epics_temp']] for k in
+            (self.hist_points[k]['epics']['TGT:PT12:VaporPressure_T'] for k in
              times.flatten()), np.double)
         self.te = TE(self.species_box.currentText(), float(self.field_value.text()), areas.flatten(), temps)
         self.set_but.setEnabled(True)
@@ -222,7 +248,6 @@ class TETab(QWidget):
     def use_te(self):
         '''Print TE out to json file named after time taken, set CC'''
         self.te.print_te()
-        self.parent.set_cc(self.te.cc)
 
     def fit_exp(self, data):
         '''Exponential fit to area of time data with scipy
@@ -256,6 +281,5 @@ class TETab(QWidget):
         x, y = x.flatten(), y.flatten()
         pf, pcov = optimize.curve_fit(lambda t, a, b: a + t * b, x, y, p0=p0)
         return pf, np.sqrt(np.diag(pcov))
-
 
 
