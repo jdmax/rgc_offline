@@ -181,7 +181,7 @@ class TETab(QWidget):
             self.te_model.setItem(i, 0, QStandardItem(str(self.hist_points[stamp]['stop_stamp'])))
             self.te_model.setItem(i, 1, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
             self.te_model.setItem(i, 2, QStandardItem(f"{self.hist_points[stamp]['area']:.10f}"))
-            self.te_model.setItem(i, 3, QStandardItem(str(self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T'])))
+            self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
 
     def double_clicked(self, item):
         '''Remove event from table when double clicked'''
@@ -191,7 +191,7 @@ class TETab(QWidget):
             self.te_model.setItem(i, 0, QStandardItem(str(self.hist_points[stamp]['stop_stamp'])))
             self.te_model.setItem(i, 1, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
             self.te_model.setItem(i, 2, QStandardItem(str(self.hist_points[stamp]['area'])))
-            self.te_model.setItem(i, 3, QStandardItem(str(self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T'])))
+            self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
 
     def update_events(self, events):
         self.hist_points = events
