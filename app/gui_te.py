@@ -241,7 +241,7 @@ class TETab(QWidget):
         temps = np.fromiter(
             (self.hist_points[k]['epics']['TGT:PT12:VaporPressure_T'] for k in
              times.flatten()), np.double)
-        self.te = TE(self.species_box.currentText(), float(self.field_value.text()), areas.flatten(), temps)
+        self.te = TE(self.species_box.currentText(), float(self.field_value.text()), areas.flatten(), temps, times)
         self.set_but.setEnabled(True)
         self.teselect_label.setText(self.te.pretty_te())
 
