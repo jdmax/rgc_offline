@@ -71,14 +71,15 @@ Average Polarization:  {self.te_pol:.5f} ± {self.te_pol_std:.5f}        Average
 
     def print_te(self):
         '''Print long version of TE report to JSON file'''
-        now = datetime.datetime.now(tz=pytz.timezone('US/Eastern')).strftime("%Y-%m-%d_%H-%M-%S")
+        #now = datetime.datetime.now(tz=pytz.timezone('US/Eastern')).strftime("%Y-%m-%d_%H-%M-%S")
+        dt = datetime.datetime.fromtimestamp(self.times[-1]).strftime("%Y-%m-%d_%H-%M-%S")
         json_dict = {}
         for key, entry in self.__dict__.items():
             if isinstance(entry, np.ndarray):
                 json_dict[key] = entry.tolist()
             else:
                 json_dict.update({key: entry})
-        with open(f"te/{self.species}-{now}.json", "w") as outfile:
+        with open(f"te/{self.species}-{dt}.json", "w") as outfile:
             json.dump(json_dict, outfile, indent=4)
         return
 
