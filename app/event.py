@@ -13,13 +13,13 @@ import numpy as np
 
 
 class ConfigItem():
-    '''Single configurable item with validator
+    """Single configurable item with validator
 
     Args:
         value: Value of item
         text: Text string describing item for label
         valid: QValidator object for the value string
-    '''
+    """
 
     def __init__(self, value, text, valid):
         self.value = value

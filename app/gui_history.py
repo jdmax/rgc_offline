@@ -1,5 +1,5 @@
-'''PyNMR, J.Maxwell 2020
-'''
+"""J.Maxwell 2023
+"""
 import datetime
 import glob
 import json
@@ -14,7 +14,7 @@ from dateutil.parser import parse
 
 
 class HistTab(QWidget):
-    '''Creates history tab. '''
+    """Creates history tab. """
 
     def __init__(self, parent):
         super(QWidget, self).__init__(parent)

@@ -15,6 +15,7 @@ class TE():
         field: field value float in Tesla
         areas: 1-D numpy array with areas
         temps: 1-D numpy array with temps
+        times: 1-D numpy array with timestamps
 
     Attributes:
         field: magnetic field used for calculation
@@ -29,12 +30,13 @@ class TE():
         area_std: standard deviation of areas
     '''
 
-    def __init__(self, species, field, areas, temps):
+    def __init__(self, species, field, areas, temps, times):
 
         nuc_magtn = 5.05078658e-27  # J/T
         boltz_const = 1.380658e-23  # J/K
         self.areas = areas
         self.temps = temps
+        self.times = times
 
         if 'P' in species or 'p' in species:
             self.species = 'Proton'
@@ -62,7 +64,7 @@ class TE():
         self.area_std = np.std(areas)
 
     def pretty_te(self):
-        '''Return formated string short version of TE report'''
+        '''Return formatted string short version of TE report'''
         return f"""Material type:  {self.species}                                  Number of Points:  {self.num}
 Average Area:  {self.area:.7f} ± {self.area_std:.7f}                 Average Temperature:  {self.temp:.4f} ± {self.temp_std:.4f}
 Average Polarization:  {self.te_pol:.5f} ± {self.te_pol_std:.5f}        Average Calibration Constant:  {self.cc:.7f} ± {self.cc_std:.7f}"""
