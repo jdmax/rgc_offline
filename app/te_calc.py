@@ -81,5 +81,5 @@ Average Polarization:  {self.te_pol:.5f} ± {self.te_pol_std:.5f}        Average
                 json_dict.update({key: entry})
         with open(f"te/{self.species}-{dt}.json", "w") as outfile:
             json.dump(json_dict, outfile, indent=4)
-        return
+        return f"te/{self.species}-{dt}"
 
