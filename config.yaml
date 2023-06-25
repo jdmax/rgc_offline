@@ -1,5 +1,5 @@
 # yaml
 settings:
-  proton_data_dir: 'O:\poltar\HallB\RGC\data-p'
-  deuteron_data_dir: 'O:\poltar\HallB\RGC\data-d'
+  proton_data_dir: '/home/jmaxwell/RGC/data-p'
+  deuteron_data_dir: '/home/jmaxwell/RGC/data-d'
   te_out_dir: './te'
