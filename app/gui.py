@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         self.te_tab = TETab(self)
         self.tab_widget.addTab(self.te_tab, "Calibration")
 
+
     def load_settings(self):
         '''Load settings from YAML config file'''
 

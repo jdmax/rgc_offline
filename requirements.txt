@@ -6,3 +6,4 @@ h5py~=3.9.0
 numpy~=1.25.0
 scipy~=1.11.0
 pyqtgraph~=0.13.3
+lmfit~=1.2.1

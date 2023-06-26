@@ -160,6 +160,8 @@ class HistTab(QWidget):
 
     def select_event(self, item):
         self.update_event_plot(item)
+        stamp = float(self.event_model.data(self.event_model.index(item.row(), 0)))
+        self.selected_event = self.all[stamp]
 
     def update_event_plot(self, item):
         '''Update event plot.
