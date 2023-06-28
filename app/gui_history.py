@@ -4,6 +4,7 @@ import datetime
 import glob
 import json
 import re
+import pytz
 import numpy as np
 from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QHBoxLayout, QVBoxLayout, QGridLayout, QLineEdit, QSpacerItem, \
     QTableView, QAbstractItemView, QAbstractScrollArea, QStackedWidget, QDoubleSpinBox, QDateTimeEdit, QPushButton
@@ -98,6 +99,13 @@ class HistTab(QWidget):
         self.right.addWidget(self.sig_wid)
 
 
+        self.date_box = QGroupBox('Selected Point Metadata')
+        self.date_box.setLayout(QVBoxLayout())
+        self.right.addWidget(self.date_box)
+        self.meta_label = QLabel("Metadata will appear here when an event is selected.")
+        self.date_box.layout().addWidget(self.meta_label)
+
+
     def range_changed(self):
         '''Update time range of events used. Looks through data directory to pull in required events
         '''
@@ -134,7 +142,7 @@ class HistTab(QWidget):
                         self.all[utcstamp]['stop_time'] = line_stoptime    # full dictionary from datafile
 
         self.event_model.removeRows(0, self.event_model.rowCount())
-        for i, stamp in enumerate(self.all.keys()):
+        for i, stamp in enumerate(sorted(self.all.keys())):
             try:
                 #dt = parse(self.all[stamp]['stop_time'])
                 dt = self.all[stamp]['stop_time']
@@ -157,6 +165,11 @@ class HistTab(QWidget):
 
         self.parent.te_tab.update_events(self.all)
 
+        with open("recent_plot.txt", "w") as f:
+            for i, stamp in enumerate(sorted(self.all.keys())):
+                name = 0 if 'NIDAQ' in self.all[stamp]['channel']['name'] else 1
+                f.write(f"{self.all[stamp]['stop_stamp']}\t{self.all[stamp]['area']}\t{name}\n")
+
 
     def select_event(self, item):
         self.update_event_plot(item)
@@ -172,4 +185,10 @@ class HistTab(QWidget):
         self.raw_plot.setData(freq_list,phase-phase.max())
         self.sub_plot.setData(freq_list,sub-sub.max())
         self.fin_plot.setData(freq_list,fin)
+
+        text = "Local time: " + self.all[stamp]['stop_time'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S")
+        self.meta_label.setText(text)
+
+
+
 
