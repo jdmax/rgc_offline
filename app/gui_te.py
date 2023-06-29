@@ -181,7 +181,10 @@ class TETab(QWidget):
             self.te_model.setItem(i, 0, QStandardItem(str(self.hist_points[stamp]['stop_stamp'])))
             self.te_model.setItem(i, 1, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
             self.te_model.setItem(i, 2, QStandardItem(f"{self.hist_points[stamp]['area']:.10f}"))
-            self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
+            if 'epics' in self.hist_points[stamp]:
+                self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
+            else:
+                self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['status']['TGT:PT12:VaporPressure_T']:.8f}"))
 
     def double_clicked(self, item):
         '''Remove event from table when double clicked'''
@@ -191,7 +194,10 @@ class TETab(QWidget):
             self.te_model.setItem(i, 0, QStandardItem(str(self.hist_points[stamp]['stop_stamp'])))
             self.te_model.setItem(i, 1, QStandardItem(self.hist_points[stamp]['stop_time'].strftime("%H:%M:%S")))
             self.te_model.setItem(i, 2, QStandardItem(str(self.hist_points[stamp]['area'])))
-            self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
+            if 'epics' in self.hist_points[stamp]:
+                self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
+            else:
+                self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['status']['TGT:PT12:VaporPressure_T']:.8f}"))
 
     def update_events(self, events):
         self.hist_points = events
@@ -238,9 +244,16 @@ class TETab(QWidget):
     def take_te(self):
         '''Send points for TE to make TE object'''
         times, areas = self.te_data.T
-        temps = np.fromiter(
-            (self.hist_points[k]['epics']['TGT:PT12:VaporPressure_T'] for k in
-             times.flatten()), np.double)
+        print(self.hist_points[k])
+
+        if 'epics' in self.hist_points[stamp]:
+            temps = np.fromiter(
+                (self.hist_points[k]['epics']['TGT:PT12:VaporPressure_T'] for k in
+                 times.flatten()), np.double)
+        else:
+            temps = np.fromiter(
+                (self.hist_points[k]['status']['TGT:PT12:VaporPressure_T'] for k in
+                 times.flatten()), np.double)
         self.te = TE(self.species_box.currentText(), float(self.field_value.text()), areas.flatten(), temps, times)
         self.set_but.setEnabled(True)
         self.teselect_label.setText(self.te.pretty_te())
