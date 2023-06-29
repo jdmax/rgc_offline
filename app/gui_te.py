@@ -244,13 +244,11 @@ class TETab(QWidget):
     def take_te(self):
         '''Send points for TE to make TE object'''
         times, areas = self.te_data.T
-        print(self.hist_points[k])
-
-        if 'epics' in self.hist_points[stamp]:
+        try:
             temps = np.fromiter(
                 (self.hist_points[k]['epics']['TGT:PT12:VaporPressure_T'] for k in
                  times.flatten()), np.double)
-        else:
+        except KeyError:
             temps = np.fromiter(
                 (self.hist_points[k]['status']['TGT:PT12:VaporPressure_T'] for k in
                  times.flatten()), np.double)
