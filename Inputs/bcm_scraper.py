@@ -3,7 +3,7 @@ from dateutil import parser
 
 def main():
 
-    files = glob.glob('BCM/*/*/RUN#*')
+    files = glob.glob('Inputs/*/*/RUN#*')
     dict ={}
     out = open('../BCM_all.txt', 'w')
 
