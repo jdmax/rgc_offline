@@ -8,18 +8,25 @@ import yaml
 
 def main():
     """"""
-    #print("Start: ", datetime.now())
-    #bcms = read_bcms()
-    #print("Stop: ", datetime.now())
     settings = load_settings()
+    #print("Start: ", datetime.now())
+    bcms = read_bcms()   # keyed on datetime
+    #print("Stop: ", datetime.now())
 
     runs = read_runs()             # keyed on run  number, value is dict with 'start_time', 'stop_time', 'species'
     moller_runs = read_mollers()   # keyed on dt, value is pol
     scatter_runs = read_scattering() # keyed on run number, value is pol
 
-    selected = select_events(settings, '02/07/2023 10:00', '02/07/2023 10:30')   # give in eastern
+    for run in runs.keys():
+        events = select_events(settings, runs[run]['start_time'], runs[run]['stop_time'])
+        weighted_pol = 0
+        weight = 0
+        # Charge average pol per run
+        for event in events:
 
-    print(len(selected))
+
+    # go through scattering runs and get Pt using Pb, put in same file
+
 
 
 
@@ -122,8 +129,8 @@ def select_events(settings, begin, end):
     eastern = tz.gettz('US/Eastern')
     utc = tz.gettz('UTC')
 
-    begin = parser.parse(begin).replace(tzinfo=eastern)
-    end = parser.parse(end).replace(tzinfo=eastern)
+    #begin = parser.parse(begin).replace(tzinfo=eastern)
+    #end = parser.parse(end).replace(tzinfo=eastern)
     filename_regex = re.compile(
         '(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
     all_files = glob.glob(f"{settings['proton_data_dir']}/*.txt") \
