@@ -5,24 +5,51 @@ import shelve
 import re
 import json
 import yaml
+import numpy as np
 
 def main():
     """"""
-    settings = load_settings()
-    #print("Start: ", datetime.now())
-    bcms = read_bcms()   # keyed on datetime
-    #print("Stop: ", datetime.now())
+    e_per_nc = int(6.241e9)  # electrons per nanocoloumb
+    eastern = tz.gettz('US/Eastern')
+    utc = tz.gettz('UTC')
 
+    settings = load_settings()
+    bcms = read_bcms()   # keyed on datetime
     runs = read_runs()             # keyed on run  number, value is dict with 'start_time', 'stop_time', 'species'
     moller_runs = read_mollers()   # keyed on dt, value is pol
     scatter_runs = read_scattering() # keyed on run number, value is pol
 
-    for run in runs.keys():
+
+    for run in sorted(runs.keys()):
         events = select_events(settings, runs[run]['start_time'], runs[run]['stop_time'])
+        if '20' in runs[run]['cell']:
+            raster_area = np.pi*9*9  # assuming 18mm raster
+        elif '15' in runs[run]['cell']:
+            raster_area = np.pi*6.5*6.5  # assuming 13mm raster
+        else:
+            print('No cell match')
+            raster_area = 1
         weighted_pol = 0
         weight = 0
         # Charge average pol per run
-        for event in events:
+        for event in sorted(events):
+            sum_charge = 0
+            event_start = datetime.fromtimestamp(float(event['start_stamp']),utc)
+            event_stop = datetime.fromtimestamp(float(event['stop_stamp']),utc)
+            include_bcms = []
+            for dt in bcms.keys():  # find bcms to include
+                if event_start < dt < event_stop:
+                    include_bcms.append(dt)   #
+            previous = 0
+            for dt in sorted(include_bcms):  # do time weighted sum
+                if previous = 0: previous = dt
+                sum_charge += bcms[dt]*(dt-previous)     # summming nanocoulombs by time
+            event['dose'] = sum_charge*e_per_nc/raster_area
+
+
+
+
+      # for each event, sum bcms between start and stop to get dose deposited
 
 
     # go through scattering runs and get Pt using Pb, put in same file
@@ -74,13 +101,14 @@ def read_runs():
 
     files = ["../inputs/NH3_runs.txt", "../inputs/ND3_runs.txt"]
 
-    read_regex = re.compile('(\d\d\/\d\d\/\d\d)\s(\d+)\s(\d\d:\d\d)\s(\d\d:\d\d)')
+    read_regex = re.compile('(\d+\/\d+\/\d\d)\s(\d+)\s(\d\d:\d\d)\s(\d\d:\d\d)\s(\d\d)')
     for file in files:
         with open(file, 'r') as f:
             matches = read_regex.findall(f.read())
             for match in matches:
                 entry = {}
-                date, run, start, stop = match
+                date, run, start, stop, cell = match
+                entry['cell'] = cell
                 entry['start_time'] = parser.parse(date+" "+start)
                 if start.split(":")[0] > stop.split(":")[0]:     # handle runs that end on next day
                     dt = parser.parse(date+" "+stop).replace(tzinfo=eastern)
