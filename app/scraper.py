@@ -20,7 +20,7 @@ def main():
     scatter_runs = read_scattering() # keyed on run number, value is pol
 
 
-    for run in sorted(runs.keys()):
+    for run in sorted(runs.keys()):   # get dose for this event
         events = select_events(settings, runs[run]['start_time'], runs[run]['stop_time'])
         if '20' in runs[run]['cell']:
             raster_area = np.pi*9*9  # assuming 18mm raster
@@ -43,13 +43,12 @@ def main():
             previous = 0
             for dt in sorted(include_bcms):  # do time weighted sum
                 if previous = 0: previous = dt
+                if dt-previous > 60: # too long since last bcm reading, assuming beam off in between
+                    previous = dt
+                    continue
                 sum_charge += bcms[dt]*(dt-previous)     # summming nanocoulombs by time
             event['dose'] = sum_charge*e_per_nc/raster_area
 
-
-
-
-      # for each event, sum bcms between start and stop to get dose deposited
 
 
     # go through scattering runs and get Pt using Pb, put in same file
