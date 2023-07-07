@@ -3,9 +3,11 @@ from dateutil import tz, parser
 import glob
 import shelve
 import re
+import os
 import json
 import yaml
 import numpy as np
+import pandas as pd
 
 def main():
     """"""
@@ -15,58 +17,62 @@ def main():
 
     settings = load_settings()
     print("Loading BCMs", datetime.now())
-    bcms = read_bcms()   # keyed on datetime
+    bcms = read_bcms()   # dataframe index on datetime
+    print(bcms)
     runs = read_runs()             # keyed on run  number, value is dict with 'start_time', 'stop_time', 'species'
+
     print("Loading events", datetime.now())
-    events = get_events(settings)
+    events = get_events(settings)  # dataframe index on datetime
     moller_runs = read_mollers()   # keyed on dt, value is pol
     scatter_runs = read_scattering() # keyed on run number, value is pol
     print("Finished loads", datetime.now())
 
     out = open('run_online.txt', 'w')
+    out.write(f"#run\tstop_time\tspecies\tcell\tcharge_avg\trun_dose(Pe/cm2)\n")
 
     for run in sorted(runs.keys()):   # get dose for this event
+        #if '16138' not in run: continue
         print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
-        selected = select_events(events, runs[run]['start_dt'], runs[run]['stop_dt'])
+        try:
+            selected = events.loc[str(runs[run]['start_time']):str(runs[run]['stop_time'])]
+        except ValueError:
+            print('ValueError:', str(runs[run]['start_time']), str(runs[run]['stop_time']))
+        #print(selected)
         if '20' in runs[run]['cell']:
             raster_area = np.pi*0.9*0.9  # assuming 18mm raster
         elif '15' in runs[run]['cell']:
-            raster_area = np.pi*0.65*0.65  # assuming 13mm raster
+            raster_area = np.pi*0.7*0.7  # assuming 14mm raster
         else:
             print('No cell match')
             raster_area = 1
         weighted_pol = 0
         weight = 0
         # Charge average pol per run
-        for event in sorted(selected.keys()):
+        for index, row in selected.iterrows():  # loop through selected events
             sum_charge = 0
-            event_start = datetime.fromtimestamp(float(selected[event]['start_stamp']),utc)
-            event_stop = datetime.fromtimestamp(float(selected[event]['stop_stamp']),utc)
-            include_bcms = []
-            for dt in bcms.keys():  # find bcms to include
-                if event_start < dt < event_stop:
-                    include_bcms.append(dt)   #
+            begin = row['start_dt']
+            end = row['stop_dt']
+            include_bcms = bcms.loc[str(begin):str(end)]
             previous = 0
-            for dt in sorted(include_bcms):  # do time weighted sum
+            for dt, bcm_row in include_bcms.iterrows():  # do time weighted sum
                 if previous == 0: previous = dt
                 if dt - previous > timedelta(seconds=60): # too long since last bcm reading, assuming beam off in between
                     previous = dt
                     continue
-                if bcms[dt]<1: continue # skip tiny readings
-                sum_charge += bcms[dt]*(dt-previous).total_seconds()     # summing nanocoulombs by time
-                print(bcms[dt],(dt-previous).total_seconds())
+                if bcm_row[0]<1: continue # skip tiny readings
+                sum_charge += bcm_row[0]*(dt-previous).total_seconds()     # summing nanocoulombs by time
+                #print("bcm",bcm_row[0],(dt-previous).total_seconds())
+                previous = dt
 
-            selected[event]['dose'] = sum_charge*e_per_nc/raster_area
-            print(event, selected[event]['dose'])
-            weighted_pol += selected[event]['dose']*selected[event]['pol']
-            weight += selected[event]['dose']
-        charge_avg = weighted_pol/weight
+            row['dose'] = sum_charge*e_per_nc/raster_area
+            #print("event dose:",index, row['dose']/1E15)
+            weighted_pol += row['dose']*row['pol']
+            weight += row['dose']
+        charge_avg = weighted_pol/weight if weight>0 else 0
         run_dose = weight
-        out.write(f"{run}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg}\t{run_dose}")
+        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg:.4f}\t{run_dose/1E15}\n")
 
     # go through scattering runs and get Pt using Pb, put in same file
-
-
 
 
 def read_bcms():
@@ -76,9 +82,9 @@ def read_bcms():
     eastern = tz.gettz('US/Eastern')
     utc = tz.gettz('UTC')
 
-    shelf = shelve.open('bcm_shelf')
-    if 'bcms' in shelf:         # if already in shelf, return that, otherwise read from file
-        bcms.update(shelf['bcms'])
+    if os.path.isfile('bcm.pkl'):         # if already in pickle, return that, otherwise read from file
+        df = pd.read_pickle('bcm.pkl')
+        df.sort_index()
     else:
         for file in files:
             with open(file, 'r') as f:
@@ -92,9 +98,10 @@ def read_bcms():
                         bcms[utc_dt] = float(ipm)
                     else:
                         bcms[utc_dt] = float(scaler)
-        shelf['bcms'] = bcms
-        shelf.close()
-    return bcms
+        df = pd.DataFrame.from_dict(bcms, orient='index')
+        df.sort_index()
+        df.to_pickle('bcm.pkl')
+    return df
 
 
 def load_settings():
@@ -113,7 +120,7 @@ def read_runs():
 
     files = ["../inputs/NH3_runs.txt", "../inputs/ND3_runs.txt"]
 
-    read_regex = re.compile('(\d+\/\d+\/\d\d)\s(\d+)\s(\d\d:\d\d)\s(\d\d:\d\d)\s(\d\d)')
+    read_regex = re.compile('(\d+\/\d+\/\d+)\s(\d+)\s(\d+:\d+)\s(\d+:\d+)\s(\d\d)')
     for file in files:
         with open(file, 'r') as f:
             matches = read_regex.findall(f.read())
@@ -175,11 +182,11 @@ def get_events(settings):
                 + glob.glob(f"{settings['deuteron_data_dir']}/*.txt")
     events = {}
 
-    shelf = shelve.open('event_shelf')
-    if 'events' in shelf:         # if already in shelf, return that, otherwise read from file
-        events.update(shelf['events'])
+    if os.path.isfile('event.pkl'):         # if already in pickle, return that, otherwise read from file
+        df = pd.read_pickle('event.pkl')
+        df.sort_index()
     else:
-        print("Filling shelf")
+        print("Filling pickle")
         for eventfile in all_files:
             if 'base' in eventfile or 'current' in eventfile: continue
             print('Parsing file:', eventfile)
@@ -192,23 +199,12 @@ def get_events(settings):
                     event['start_dt'] = parser.parse(event['start_time']).replace(tzinfo=utc)
                     event['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
                     events[event['stop_dt']] = event
+        df = pd.DataFrame.from_dict(events, orient='index')
+        print("Done filling ")
+        df.sort_index()
+        df.to_pickle('event.pkl')
+    return df
 
-        print("Done filling shelf")
-        shelf['events'] = events
-        shelf.close()
-    return events
-
-def select_events(events, begin, end):
-    '''Return events from datetime range given'''
-    eastern = tz.gettz('US/Eastern')
-    utc = tz.gettz('UTC')
-    selected_events = []
-
-    for event_dt in sorted(events.keys()):
-        dt = events[event_dt]['stop_dt']
-        if begin <  dt < end and 'pol' in events[event_dt]:
-            selected_events[dt] = events[event_dt]  # full dictionary from datafile
-    return selected_events
 
 if __name__ == '__main__':
     main()
