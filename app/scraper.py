@@ -14,18 +14,20 @@ def main():
     utc = tz.gettz('UTC')
 
     settings = load_settings()
-    print("Loading BCMs")
+    print("Loading BCMs", datetime.now())
     bcms = read_bcms()   # keyed on datetime
     runs = read_runs()             # keyed on run  number, value is dict with 'start_time', 'stop_time', 'species'
-    print("Loading events")
+    print("Loading events", datetime.now())
     events = get_events(settings)
     moller_runs = read_mollers()   # keyed on dt, value is pol
     scatter_runs = read_scattering() # keyed on run number, value is pol
-    print("Finished loads")
+    print("Finished loads", datetime.now())
+
+    out = open('run_online.txt', 'w')
 
     for run in sorted(runs.keys()):   # get dose for this event
         print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
-        selected = select_events(events, runs[run]['start_time'], runs[run]['stop_time'])
+        selected = select_events(events, runs[run]['start_dt'], runs[run]['stop_dt'])
         if '20' in runs[run]['cell']:
             raster_area = np.pi*0.9*0.9  # assuming 18mm raster
         elif '15' in runs[run]['cell']:
@@ -56,7 +58,11 @@ def main():
 
             selected[event]['dose'] = sum_charge*e_per_nc/raster_area
             print(event, selected[event]['dose'])
-    quit()
+            weighted_pol += selected[event]['dose']*selected[event]['pol']
+            weight += selected[event]['dose']
+        charge_avg = weighted_pol/weight
+        run_dose = weight
+        out.write(f"{run}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg}\t{run_dose}")
 
     # go through scattering runs and get Pt using Pb, put in same file
 
@@ -180,7 +186,9 @@ def get_events(settings):
             with open(eventfile, 'r') as f:
                 for line in f:
                     event = json.loads(line)
-                    s = event['stop_time']
+                    for key in list(event.keys()):
+                        if isinstance(event[key], list):
+                            del event[key]
                     event['start_dt'] = parser.parse(event['start_time']).replace(tzinfo=utc)
                     event['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
                     events[event['stop_dt']] = event
@@ -198,7 +206,7 @@ def select_events(events, begin, end):
 
     for event_dt in sorted(events.keys()):
         dt = events[event_dt]['stop_dt']
-        if begin <  dt < end and 'pol' in event:
+        if begin <  dt < end and 'pol' in events[event_dt]:
             selected_events[dt] = events[event_dt]  # full dictionary from datafile
     return selected_events
 
