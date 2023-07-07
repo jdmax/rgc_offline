@@ -27,11 +27,11 @@ def main():
     scatter_runs = read_scattering() # keyed on run number, value is pol
     print("Finished loads", datetime.now())
 
-    out = open('run_online.txt', 'w')
+    out = open('run_online2.txt', 'w')
     out.write(f"#run\tstop_time\tspecies\tcell\tcharge_avg\trun_dose(Pe/cm2)\n")
 
     for run in sorted(runs.keys()):   # get dose for this event
-        #if '16138' not in run: continue
+        #if '16243' not in run: continue
         print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
         try:
             selected = events.loc[str(runs[run]['start_time']):str(runs[run]['stop_time'])]
@@ -47,6 +47,11 @@ def main():
             raster_area = 1
         weighted_pol = 0
         weight = 0
+        if 16500 < int(run) < 16636:   # cheat for these crazy runs
+            pol_mult = 0.7
+        else:
+            pol_mult = 1
+
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events
             sum_charge = 0
@@ -61,15 +66,17 @@ def main():
                     continue
                 if bcm_row[0]<1: continue # skip tiny readings
                 sum_charge += bcm_row[0]*(dt-previous).total_seconds()     # summing nanocoulombs by time
-                #print("bcm",bcm_row[0],(dt-previous).total_seconds())
+                #if bcm_row[0] > 5:
+                #    print("bcm",bcm_row[0],(dt-previous).total_seconds())
                 previous = dt
 
             row['dose'] = sum_charge*e_per_nc/raster_area
-            #print("event dose:",index, row['dose']/1E15)
-            weighted_pol += row['dose']*row['pol']
+            #print("event dose:",index, row['dose']/1E12)
+            weighted_pol += row['dose']*row['pol']*pol_mult
             weight += row['dose']
         charge_avg = weighted_pol/weight if weight>0 else 0
         run_dose = weight
+        print("run dose:", run, run_dose / 1E12)
         out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg:.4f}\t{run_dose/1E15}\n")
 
     # go through scattering runs and get Pt using Pb, put in same file
