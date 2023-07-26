@@ -240,6 +240,7 @@ class TETab(QWidget):
         self.raw_plot.setData(freq_list, phase - phase.max())
         self.sub_plot.setData(freq_list, sub - sub.max())
         self.fin_plot.setData(freq_list, fin)
+        self.parent.anal_tab.set_event(self.hist_points[stamp])
 
     def take_te(self):
         '''Send points for TE to make TE object'''

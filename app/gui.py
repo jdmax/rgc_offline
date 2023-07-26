@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QErrorMessage, QTabWidget, QLabel, QWid
 #from app.event import Config, Scan, RunningScan, Event, Baseline, HistPoint, History
 from app.gui_history import HistTab
 from app.gui_te import TETab
+from app.gui_anal import AnalTab
 
 
 class MainWindow(QMainWindow):
@@ -35,6 +36,8 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(self.hist_tab, "History")
         self.te_tab = TETab(self)
         self.tab_widget.addTab(self.te_tab, "Calibration")
+        self.anal_tab = AnalTab(self)
+        self.tab_widget.addTab(self.anal_tab, "Analysis")
 
     def load_settings(self):
         '''Load settings from YAML config file'''
