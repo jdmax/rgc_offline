@@ -1122,12 +1122,12 @@ class FitDeuteron(QWidget):
 
         sweep = event.fitsub
         freqs = event.freq_list
+        print("Starting D fit")
 
         labels = [e.text() for e in self.param_label]
         values = [float(e.text()) for e in self.param_edit]
 
         self.params = dict(zip(labels, values))
-        print(self.params)
 
         res = DFits(freqs, sweep, self.params)
 
@@ -1143,10 +1143,12 @@ class FitDeuteron(QWidget):
         i = 0
         for name, param in res.result.params.items():
             i += 1
-            text = text + f'{name} {param.value:.3f}+-{param.stderr:.3f} '
+            print(f"{name} {param.value:.3f}\t")
+            text = text + f"{name}: {param.value:.3f}\t"
             if i == 4:
                 text = text + "\n"
         self.message.setText(f"Polarization: {pol * 100:.2f}%, Area:  {area:.2f}, CC:  {cc:.2f}\n {text}")
+        print("Finished D fit")
         return fit, r, pol
 
 
