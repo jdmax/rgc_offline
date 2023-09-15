@@ -16,19 +16,17 @@ def main():
     utc = tz.gettz('UTC')
 
     settings = load_settings()
-    print("Loading BCMs", datetime.now())
     bcms = read_bcms()   # dataframe index on datetime
-    print(bcms)
     runs = read_runs()             # keyed on run  number, value is dict with 'start_time', 'stop_time', 'species'
+    ccs = read_offline_cc()             # keyed on run  number, value cc float
 
-    print("Loading events", datetime.now())
     events = get_events(settings)  # dataframe index on datetime
-    moller_runs = read_mollers()   # keyed on dt, value is pol
-    scatter_runs = read_scattering() # keyed on run number, value is pol
+    #moller_runs = read_mollers()   # keyed on dt, value is pol
+    #scatter_runs = read_scattering() # keyed on run number, value is pol
     print("Finished loads", datetime.now())
 
-    out = open('run_online2.txt', 'w')
-    out.write(f"#run\tstop_time\tspecies\tcell\tcharge_avg\trun_dose(Pe/cm2)\n")
+    out = open('run_online.txt', 'w')
+    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
 
     for run in sorted(runs.keys()):   # get dose for this event
         #if '16243' not in run: continue
@@ -45,12 +43,9 @@ def main():
         else:
             print('No cell match')
             raster_area = 1
-        weighted_pol = 0
+        weighted_on_pol = 0
+        weighted_off_pol = 0
         weight = 0
-        if 16500 < int(run) < 16636:   # cheat for these crazy runs
-            pol_mult = 0.7
-        else:
-            pol_mult = 1
 
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events
@@ -72,12 +67,18 @@ def main():
 
             row['dose'] = sum_charge*e_per_nc/raster_area
             #print("event dose:",index, row['dose']/1E12)
-            weighted_pol += row['dose']*row['pol']*pol_mult
+            weighted_on_pol += row['dose']*row['pol']
+            try:
+                weighted_off_pol += row['dose']*row['area']*ccs[run]
+            except Exception as e:
+                print("Error in weighted offline sum")
+                weighted_off_pol = 0
             weight += row['dose']
-        charge_avg = weighted_pol/weight if weight>0 else 0
+        charge_avg_on = weighted_on_pol/weight if weight>0 else 0
+        charge_avg_off = weighted_off_pol/weight if weight>0 else 0
         run_dose = weight
         print("run dose:", run, run_dose / 1E12)
-        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg:.4f}\t{run_dose/1E15}\n")
+        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\n")
 
     # go through scattering runs and get Pt using Pb, put in same file
 
@@ -88,6 +89,7 @@ def read_bcms():
     bcms = {}
     eastern = tz.gettz('US/Eastern')
     utc = tz.gettz('UTC')
+    print("Loading BCMs", datetime.now())
 
     if os.path.isfile('bcm.pkl'):         # if already in pickle, return that, otherwise read from file
         df = pd.read_pickle('bcm.pkl')
@@ -145,39 +147,20 @@ def read_runs():
                 runs[run] = entry
     return runs
 
-def read_mollers():
-    """Read moller files"""
-    files = glob.glob("../inputs/PB*")
-    runs = {} # keyed on date, value is polarization
+def read_offline_cc():
+    """Read calibration period file to get CCs"""
     eastern = tz.gettz('US/Eastern')
-    utc = tz.gettz('UTC')
 
-    moller_regex = re.compile('Moller Run #(\d+)\n.+Polarization\s\(\%\)([\s-]\d+.\d+).+\n+baltzell\s-\s(\d{4}-\d{2}-\d{2} \d{2}:\d{2})')
+    files = ["../inputs/nh3_cc.txt", "../inputs/nd3_cc.txt"]
 
+    ccs = {}
     for file in files:
         with open(file, 'r') as f:
-            matches = moller_regex.findall(f.read())
-            for match in matches:
-                run, pol, dt = match
-                datetime = parser.parse(dt).replace(tzinfo=eastern)
-                runs[datetime] = pol
-    return runs
-
-
-def read_scattering():
-    """Read scattering example file"""
-    file = "../inputs/scattering_run.txt"
-    run_dict = {} # keyed on run, value is polarization
-
-    with open(file, 'r') as f:
-        for line in f:
-            if 'Runs' in line: continue
-            runstr, pol, err = line.strip().split(';')
-            runs = runstr.split(',')
-            for run in runs:
-                run_dict[run] = pol
-    return run_dict
-
+            for line in f:
+                if "#" in line: continue
+                date, run, area, on_cc, on_pol, cc, pol = line.split()
+                ccs[run] = float(cc)
+    return ccs
 
 def get_events(settings):
 
@@ -188,6 +171,7 @@ def get_events(settings):
     all_files = glob.glob(f"{settings['proton_data_dir']}/*.txt") \
                 + glob.glob(f"{settings['deuteron_data_dir']}/*.txt")
     events = {}
+    print("Loading events", datetime.now())
 
     if os.path.isfile('event.pkl'):         # if already in pickle, return that, otherwise read from file
         df = pd.read_pickle('event.pkl')
