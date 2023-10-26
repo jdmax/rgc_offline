@@ -1,7 +1,9 @@
 # yaml
 settings:
+  input_dir: 'inputs'
   proton_data_dir: 'O:\poltar\HallB\RGC\data-p'
   deuteron_data_dir: 'O:\poltar\HallB\RGC\data-d'
+  bcm_dir: 'O:\poltar\HallB\RGC\BCM\Mya'
   te_out_dir: '.\te'
   analysis:
     base_def: 0             # index of default baseline subtraction method
