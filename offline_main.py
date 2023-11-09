@@ -24,7 +24,7 @@ def main():
     out = open('run_online.txt', 'w')
     out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
 
-    for run in sorted(runs.keys()):   # get dose for this event
+    for run in sorted(runs.keys()):   # get dose for this run
         #if '16243' not in run: continue
         print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
         try:

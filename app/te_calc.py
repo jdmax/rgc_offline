@@ -37,21 +37,22 @@ class TE():
         self.areas = areas
         self.temps = temps
         self.times = times
-
+        self.field = field
+        temps[temps < 1E-5] = 1E-9  # replace zero values to avoid divide by zero
         if 'P' in species or 'p' in species:
             self.species = 'Proton'
             magneton = 2.79268  # mu_0
+            te_pols = np.tanh(magneton * nuc_magtn * field / boltz_const / temps)
+            ccs = te_pols / areas
         elif 'D' in species or 'd' in species:
             self.species = 'Deuteron'
             magneton = 0.857387  # mu_0
+            tanh_args = magneton * nuc_magtn * field / (2 * boltz_const * temps)
+            te_pols = (4 * np.tanh(tanh_args))/(3 + np.tanh(tanh_args)**2)
+            ccs = te_pols / areas
         else:
             print('Incorrect species')
             sys.exit()
-        temps[temps < 1E-5] = 1E-9  # replace zero values to avoid divide by zero
-
-        self.field = field
-        te_pols = np.tanh(magneton * nuc_magtn * field / boltz_const / temps)
-        ccs = te_pols / areas
 
         self.num = len(ccs)
         self.te_pol = np.mean(te_pols)
