@@ -1147,7 +1147,7 @@ class FitDeuteron(QWidget):
             text = text + f"{name}: {param.value:.3f}\t"
             if i == 4:
                 text = text + "\n"
-        self.message.setText(f"Polarization: {pol * 100:.2f}%, Area:  {area:.2f}, CC:  {cc:.2f}\n {text}")
+        self.message.setText(f"Polarization: {pol * 100:.4f}%, Area:  {area:.4f}, CC:  {cc:.4f}\n {text}")
         print("Finished D fit")
         return fit, r, pol
 
