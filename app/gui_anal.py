@@ -839,7 +839,7 @@ class SumRangeRes(QWidget):
         self.parent.run_analysis()
 
     def result(self, event):
-        '''Perform standard polyfit baseline subtraction
+        '''Perform sum in given range
 
         Arguments:
             event: Event instance with sweeps to subtract
