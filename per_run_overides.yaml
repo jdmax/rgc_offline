@@ -1,0 +1,32 @@
+# J. Maxwell, 2024
+# Offline analysis per run overrides
+defaults:
+  results_method: poly_fit_range    # options are poly_fit_range or d_fit
+  wings: # default bounds for fit wings, must be four numbers between 0 and 1
+    - 0.01
+    - 0.25
+    - 0.75
+    - 0.99
+  sum_range: # default bounds for range integration option
+    - 0.35
+    - 0.65
+  d_fit_params: # initial parameters for Dulya fits
+    A: 0.03
+    G: -0.00003
+    # r: 1.2    r is determined as -.9 or 1.1 depending on the sign of the signal
+    wQ: 0.027
+    wL: 32.69
+    eta: -0.02
+    xi: -0.001
+runs:   # run ranges to apply overrides, key is starting run
+  17264:
+    end: 17296
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.35
+      - 0.65
+    cc: 0.2

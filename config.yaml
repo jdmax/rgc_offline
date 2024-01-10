@@ -25,3 +25,6 @@ settings:
         wL : 32.69
         eta : -0.02
         xi : -0.001
+  offline:
+    start_run: 17264
+    stop_run: 17273
