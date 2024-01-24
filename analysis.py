@@ -13,7 +13,7 @@ def standard_baseline(event, base_event):
 def poly_fit_sub(event, wings, poly):
     """
     wings: 4 numbers determining fit wings from 0 to 1
-    poly: polynomial function
+    poly: polynomial function as method
     """
     pi = [0.01, 0.8, 0.01, 0.001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001]
 
