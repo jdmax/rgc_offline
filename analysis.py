@@ -6,21 +6,67 @@ from lmfit import Model
 from app.deuteron_fits import DFits
 
 
-def standard_baseline(event, base_event):
-    basesweep = base_event.basesweep
-    return basesweep, event.phase - basesweep
+def area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range):
+    """Perform standard area subtraction analysis, including baseline subtraction, poly fit and subtraction and are sum in range
 
-def poly_fit_sub(event, wings, poly):
+    Arguments:
+        freq_list: frequency list
+        phase: raw phase signal
+        basesweep: baseline signal
+        wings: list of 4 numbers 0 to 1 defining fit wings
+        poly: polynomial function to use for polyfit subtraction
+        sum_range: list of 2 numbers 0 to 1 defining sum range
+
+    Returns:
+        curve used, area
+    """
+
+    basesub = standard_baseline(phase, basesweep)
+    fit, fitsub = poly_fit_sub(basesub, freq_list, wings, poly)
+    final_curve, area = signal_sum_range(fitsub, sum_range)
+
+    return basesub, fitsub, final_curve, area
+
+
+def peak_fit_signal_analysis(freq_list, phase, basesweep, wings, poly, params):
+    """Perform deuteron peak fit analysis, including baseline subtraction, poly fit and peak fit
+
+    Arguments:
+        freq_list: frequency list
+        phase: raw phase signal
+        basesweep: baseline signal
+        wings: list of 4 numbers 0 to 1 defining fit wings
+        range: list of 2 numbers 0 to 1 defining sum range
+        poly: polynomial function to use
+        params: d fit param dictionary
+
+    Returns:
+        curve used, polarization
+    """
+
+    basesub = standard_baseline(phase, basesweep)
+    fit, fitsub = poly_fit_sub(basesub, freq_list, wings, poly)
+    fit, pol, cc = d_fit(fitsub, freq_list, params)
+
+    return basesub, fitsub, fit, pol, cc
+
+
+def standard_baseline(phase, basesweep):  # pass event.phase and base_event.basesweep
+    return phase - basesweep
+
+
+def poly_fit_sub(basesub, freq_list, wings, poly): # pass event.: basesub, freq_list, wings and poly method
     """
     wings: 4 numbers determining fit wings from 0 to 1
     poly: polynomial function as method
     """
     pi = [0.01, 0.8, 0.01, 0.001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001]
 
-    sweep = event.basesub
-    freqs = event.freq_list
+    sweep = basesub
+    freqs = freq_list
     bounds = [x * len(sweep) for x in wings]
     data = [z for x, z in enumerate(zip(freqs, sweep)) if (bounds[0] < x < bounds[1] or bounds[2] < x < bounds[3])]
+    #print(data)
     X = np.array([x for x, y in data])
     Y = np.array([y for x, y in data])
     pf, pcov = optimize.curve_fit(poly, X, Y, p0=pi)
@@ -49,46 +95,48 @@ def poly4(x, *p):
     return p[0] + p[1] * x + p[2] * np.power(x, 2) + p[3] * np.power(x, 3) + p[4] * np.power(x, 4)
 
 
-
-def sum_range(event, wings):
+def signal_sum_range(fitsub, sum_range):
     """Perform standard polyfit baseline subtraction
 
     Arguments:
-        event: Event instance with sweeps to subtract
-        wings: 2 numbers between 0 and 1 giving range to sum between
+        fitsub: polyfit subtracted signal
+        sum_range: 2 numbers between 0 and 1 giving range to sum between
 
     Returns:
-        polyfit used, baseline subtracted sweep
+        curve used, area
     """
 
-    sweep = event.fitsub
-    bounds = [x * len(sweep) for x in wings]
+    sweep = fitsub
+    bounds = [x * len(sweep) for x in sum_range]
+    print(sweep)
     data = [(x, y) if bounds[0] < x < bounds[1] else (x, 0) for x, y in enumerate(sweep)]
     Y = np.array([y for x, y in data])
+    print(Y)
     area = Y.sum()
-    pol = area * event.cc
-    return Y, area, pol
+    print(area)
+    #pol = area * event.cc
+    return Y, area
 
 
-def d_fit(settings, event, params):
+def d_fit(fitsub, freq_list, params):
     """Perform Dueteron fit and calculate polarization
 
     Arguments:
-        event: Event instance with sweeps to fit
+        fitsub: poly subtracted signal
+        freq_list: frequency list
+        params: fit parameters
 
     Returns:
         fit, resulting r asymmetry (instead of area) and polarization
     """
 
-    sweep = event.fitsub
-    freqs = event.freq_list
+    sweep = fitsub
+    freqs = freq_list
     print("Starting D fit")
 
     #labels = [e.text() for e in self.param_label]
     #values = [float(e.text()) for e in self.param_edit]
     #self.params = dict(zip(labels, values))
-
-    params = settings['analysis']['d_fit_params']
 
     res = DFits(freqs, sweep, params)
 
@@ -110,4 +158,4 @@ def d_fit(settings, event, params):
             text = text + "\n"
     #self.message.setText(f"Polarization: {pol * 100:.4f}%, Area:  {area:.4f}, CC:  {cc:.4f}\n {text}")
     print("Finished D fit")
-    return fit, r, pol
+    return fit, pol, cc

@@ -3,6 +3,7 @@ settings:
   input_dir: 'inputs'
   proton_data_dir: 'O:\poltar\HallB\RGC\data-p'
   deuteron_data_dir: 'O:\poltar\HallB\RGC\data-d'
+  sample_data_dir: 'O:\poltar\HallB\RGC\sample_data'
   bcm_dir: 'O:\poltar\HallB\RGC\BCM\Mya'
   te_out_dir: '.\te'
   analysis:

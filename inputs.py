@@ -10,11 +10,13 @@ import pandas as pd
 
 
 def load_settings():
-    '''Load settings from YAML config file'''
+    '''Load settings from YAML config files'''
 
-    with open('../config.yaml') as f:                           # Load settings from YAML files
+    with open('config.yaml') as f:                           # Load settings from YAML files
        config_dict = yaml.load(f, Loader=yaml.FullLoader)
-    return config_dict['settings']
+    with open('per_run_overrides.yaml') as f:                           # Load settings from YAML files
+       override_dict = yaml.load(f, Loader=yaml.FullLoader)
+    return config_dict['settings'], override_dict['defaults'], override_dict['runs']
 
 def read_bcms(settings):
     """Read Inputs files, choosing between scaler_calc1 and IPM2C21A based on value, return dict keyed on datetime"""
@@ -93,8 +95,9 @@ def get_events(settings):
     utc = tz.gettz('UTC')
     filename_regex = re.compile(
         '(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
-    all_files = glob.glob(f"{settings['proton_data_dir']}/*.txt") \
-                + glob.glob(f"{settings['deuteron_data_dir']}/*.txt")
+    #all_files = glob.glob(f"{settings['proton_data_dir']}/*.txt") \
+    #            + glob.glob(f"{settings['deuteron_data_dir']}/*.txt")
+    all_files = glob.glob(f"{settings['sample_data_dir']}/*.txt")
     events = {}
     print("Loading events", datetime.now())
 
@@ -109,14 +112,15 @@ def get_events(settings):
             with open(eventfile, 'r') as f:
                 for line in f:
                     event = json.loads(line)
-                    for key in list(event.keys()):
-                        if isinstance(event[key], list):
-                            del event[key]
+                    #for key in list(event.keys()):   # reducing data size by removing lists
+                    #    if isinstance(event[key], list):
+                    #        del event[key]
                     event['start_dt'] = parser.parse(event['start_time']).replace(tzinfo=utc)
                     event['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
                     events[event['stop_dt']] = event
+        print("Entering to dataframe")
         df = pd.DataFrame.from_dict(events, orient='index')
-        print("Done filling ")
+        print("Done filling")
         df.sort_index()
         df.to_pickle('event.pkl')
     return df
