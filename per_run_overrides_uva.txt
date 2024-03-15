@@ -32,159 +32,168 @@ runs:   # run ranges to apply overrides, key is starting run
     cc: 0.2
 
 ### NH3 from UVA (Ishara, Devin, Jay) #####
-16069:
-    end: 16069
+##  03/07/2024: proton ~ 5 Lambda/2, will give an estimate on inductance and capacitance (James)
+  16062:
+    end: 16078
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.05  
   16137:
-    end: 16137
+    end: 16178
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.038
-  16223:
-    end: 16223
+  16211:
+    end: 16260
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.0249
-  16638:
-    end: 16638
+  16650:
+    end: 16695
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.091
   16704:
-    end: 16704
+    end: 16706
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.032
-  16756:
-    end: 16756
+  16742:
+    end: 16752
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: 0.0349 
-  16990:
-    end: 16990
+  16982:
+    end: 16993
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.0109
-  17002:
-    end: 17002
-    cc: 0.0117
-  17065:
-    end: 17065
+  16995:
+    end: 17032
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
+    sum_range:
+      - 0
+      - 1
+    cc: 0.0117
+  17067:
+    end: 17102
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.00974
   17144:
-    end: 17144
+    end: 17161
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.0094
-  17352:
-    end: 17352
+  17351:
+    end: 17368
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: 0.0119
-  17567:
-    end: 17567
+  17574:
+    end: 17597
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.036
-  17702:
-    end: 17702
+  17709:
+    end: 17741
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: -0.039
-  17755:
-    end: 17755
+  17748:
+    end: 17762
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
     cc: 0.0342
-  17768:
-    end: 17768
+  17769:
+    end: 17778
     wings:
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range:
       - 0
       - 1
@@ -197,10 +206,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -14.85400417
     d_fit_params: # initial parameters for Dulya fits
       A: 0.068141667
       G: -0.00003
@@ -215,10 +225,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -2.4687
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0866
       G: -0.00003
@@ -233,10 +244,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -8.70565
     d_fit_params: # initial parameters for Dulya fits
       A: 0.072034615
       G: -0.00003
@@ -251,10 +263,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -2.939307692
     d_fit_params: # initial parameters for Dulya fits
       A: 0.086
       G: -0.00003
@@ -269,10 +282,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.450431818
     d_fit_params: # initial parameters for Dulya fits
       A: 0.078540909
       G: -0.00003
@@ -287,10 +301,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.553766667
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0745
       G: -0.00003
@@ -305,10 +320,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.509433333
     d_fit_params: # initial parameters for Dulya fits
       A: 0.08
       G: -0.00003
@@ -323,10 +339,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.54952
     d_fit_params: # initial parameters for Dulya fits
       A: 0.078
       G: -0.00003
@@ -341,10 +358,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.56138
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0767
       G: -0.00003
@@ -359,10 +377,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.516638889
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0778
       G: -0.00003
@@ -377,10 +396,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -1.601155556
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0825
       G: -0.00003
@@ -399,6 +419,7 @@ runs:   # run ranges to apply overrides, key is starting run
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.643842
     d_fit_params: # initial parameters for Dulya fits
       A: 0.07711
       G: -0.00003
@@ -417,6 +438,7 @@ runs:   # run ranges to apply overrides, key is starting run
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.620626429
     d_fit_params: # initial parameters for Dulya fits
       A: 0.077157143
       G: -0.00003
@@ -435,6 +457,7 @@ runs:   # run ranges to apply overrides, key is starting run
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.691567308
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0833
       G: -0.00003
@@ -453,6 +476,7 @@ runs:   # run ranges to apply overrides, key is starting run
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.514441667
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0795
       G: -0.00003
@@ -471,6 +495,7 @@ runs:   # run ranges to apply overrides, key is starting run
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.969773333
     d_fit_params: # initial parameters for Dulya fits
       A: 0.07665
       G: -0.00003
@@ -485,10 +510,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.746685714
     d_fit_params: # initial parameters for Dulya fits
       A: 0.081928571
       G: -0.00003
@@ -503,10 +529,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.755041667
     d_fit_params: # initial parameters for Dulya fits
       A: 0.0765
       G: -0.00003
@@ -521,10 +548,11 @@ runs:   # run ranges to apply overrides, key is starting run
       - 0.01
       - 0.25
       - 0.75
-      - 1.00
+      - 0.99
     sum_range: # default bounds for range integration option
       - 0.25
       - 0.75
+    cc: -3.736009091
     d_fit_params: # initial parameters for Dulya fits
       A: 0.082
       G: -0.00003
