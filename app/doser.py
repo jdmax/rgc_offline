@@ -25,10 +25,10 @@ def main():
     for run in sorted(runs.keys()):
         if 'p' in runs[run]['species']:
             p_dose += float(runs[run]['dose'])
-            outp.write(f"{run}\t{runs[run]['cell']}\t{runs[run]['pol']}\t{runs[run]['dose']}\t{p_dose}\n")
+            outp.write(f"{run}\t{runs[run]['cell']}\t{runs[run]['off_pol']}\t{runs[run]['dose']}\t{p_dose}\n")
         if 'd' in runs[run]['species']:
             d_dose += float(runs[run]['dose'])
-            outd.write(f"{run}\t{runs[run]['cell']}\t{runs[run]['pol']}\t{runs[run]['dose']}\t{d_dose}\n")
+            outd.write(f"{run}\t{runs[run]['cell']}\t{runs[run]['off_pol']}\t{runs[run]['dose']}\t{d_dose}\n")
 
 def read_runs():
     """Read scattering example file"""
@@ -38,13 +38,14 @@ def read_runs():
     with open(file, 'r') as f:
         for line in f:
             if '#' in line: continue
-            run, start, stop, species, cell, pol, dose = line.strip().split('\t')
+            run, start, stop, species, cell, on_pol, off_pol, dose = line.strip().split('\t')
             run_dict[run] = {}
             run_dict[run]['start'] = start
             run_dict[run]['stop'] = stop
             run_dict[run]['species'] = species
             run_dict[run]['cell'] = cell
-            run_dict[run]['pol'] = pol
+            run_dict[run]['on_pol'] = on_pol
+            run_dict[run]['off_pol'] = off_pol
             run_dict[run]['dose'] = dose
     return run_dict
 

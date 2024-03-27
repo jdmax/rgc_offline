@@ -108,12 +108,12 @@ def signal_sum_range(fitsub, sum_range):
 
     sweep = fitsub
     bounds = [x * len(sweep) for x in sum_range]
-    print(sweep)
+    #print(sweep)
     data = [(x, y) if bounds[0] < x < bounds[1] else (x, 0) for x, y in enumerate(sweep)]
     Y = np.array([y for x, y in data])
-    print(Y)
+    #print(Y)
     area = Y.sum()
-    print(area)
+    #print(area)
     #pol = area * event.cc
     return Y, area
 

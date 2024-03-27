@@ -1,12 +1,11 @@
-# J. Maxwell, 2024, Pushpa Panday, Ishara Fernando, Devin Seay, Jordan Daniel
+# J. Maxwell, 2024
 # Offline analysis per run overrides
 defaults:
   results_method: poly_fit_range    # options are poly_fit_range or d_fit
-  online_defaults: True  # If true, use analysis parameters used online
   wings: # default bounds for fit wings, must be four numbers between 0 and 1
     - 0.01
-    - 0.3
-    - 0.7
+    - 0.25
+    - 0.75
     - 0.99
   sum_range: # default bounds for range integration option
     - 0.35
@@ -20,26 +19,13 @@ defaults:
     eta: -0.02
     xi: -0.001
 runs:   # run ranges to apply overrides, key is starting run
-#  Example
-#  17264:
-#    end: 17296
-#    wings:
-#      - 0.01
-#      - 0.25
-#      - 0.75
-#      - 0.99
-#    sum_range: # default bounds for range integration option
-#      - 0
-#      - 1
-#    cc: 0.2
-### ND3 from UVA (Ishara, Devin, Jay) #####
   17264:
     end: 17296
-  #  wings:
-  #    - 0.01
-  #    - 0.25
-  #    - 0.75
-  #    - 0.99
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
     sum_range: # default bounds for range integration option
       - .25
       - .75
@@ -52,3 +38,5 @@ runs:   # run ranges to apply overrides, key is starting run
       wL: 32.69
       eta: -0.02
       xi: -0.001
+
+

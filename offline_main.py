@@ -21,7 +21,7 @@ def main():
 
     # choose which runs to analyze based on per_run_overrides ranges
     chosen_runs = {}
-    print(runs.keys())
+    #print(runs.keys())
     for start in overrides.keys():
         for number in range(start, overrides[start]['end']+1):
             if str(number) in runs:
@@ -59,7 +59,7 @@ def main():
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events, run analysis for each event
             # row is event dict
-            print(row)
+            #print(row)
             sum_charge = 0
             begin = row['start_dt']
             end = row['stop_dt']
@@ -92,15 +92,22 @@ def main():
             wings = row['settings']['analysis']['wings']
             sum_range = row['settings']['analysis']['sum_range']
             cc = ccs[run]
-
-            if runs[run]['override'] != 0:
+            if not defaults['online_defaults']:
                 if 'wings' in overrides[runs[run]['override']]:
                     wings = overrides[runs[run]['override']]['wings']
+                else:
+                    wings = defaults['wings']
                 if 'sum_range' in overrides[runs[run]['override']]:
                     sum_range = overrides[runs[run]['override']]['sum_range']
+                else:
+                    sum_range = defaults['sum_range']
                 if 'cc' in overrides[runs[run]['override']]:
                     cc = overrides[runs[run]['override']]['cc']
+                else:
+                    cc = defaults['cc']
             poly = analysis.poly3  # default is third order
+            print("wings, range, cc:", wings, sum_range, cc)
+
             #try:
             basesub, fitsub, final_curve, area = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
             weighted_off_pol += row['dose']*area*cc
