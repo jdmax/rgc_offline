@@ -193,7 +193,7 @@ def get_events(settings):
         df = pd.DataFrame.from_dict(events, orient='index')
         print("Done filling ")
         df.sort_index()
-        df.to_pickle('event.pkl')
+        df.to_pickle('event_old.pkl')
     return df
 
 

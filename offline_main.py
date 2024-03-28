@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from dateutil import tz, parser
 import numpy as np
+import pandas as pd
 
 import inputs
 import analysis
@@ -13,7 +14,7 @@ def main():
     eastern = tz.gettz('US/Eastern')
     utc = tz.gettz('UTC')
 
-    settings, defaults, overrides = inputs.load_settings()
+    settings, options, overrides = inputs.load_settings()
     bcms = inputs.read_bcms(settings)   # dataframe index on datetime
     bcms = bcms.sort_index()
     runs = inputs.read_runs(settings)         # keyed on run  number, value is dict with 'start_time', 'stop_time', 'species'
@@ -35,6 +36,8 @@ def main():
 
     out = open('run_offline.txt', 'w')
     out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
+
+    results = {}
 
     for run in sorted(chosen_runs.keys()):   # loop on runs, get dose for this run
         #if '16243' not in run: continue
@@ -92,38 +95,44 @@ def main():
             wings = row['settings']['analysis']['wings']
             sum_range = row['settings']['analysis']['sum_range']
             cc = ccs[run]
-            if not defaults['online_defaults']:
+            type = runs[run]['species']
+            if not options['online_defaults']:
                 if 'wings' in overrides[runs[run]['override']]:
                     wings = overrides[runs[run]['override']]['wings']
                 else:
-                    wings = defaults['wings']
+                    wings = options['defaults-'+type]['wings']
                 if 'sum_range' in overrides[runs[run]['override']]:
                     sum_range = overrides[runs[run]['override']]['sum_range']
                 else:
-                    sum_range = defaults['sum_range']
+                    sum_range = options['defaults-'+type]['sum_range']
                 if 'cc' in overrides[runs[run]['override']]:
                     cc = overrides[runs[run]['override']]['cc']
                 else:
-                    cc = defaults['cc']
+                    cc = options['defaults-'+type]['cc']
             poly = analysis.poly3  # default is third order
-            print("wings, range, cc:", wings, sum_range, cc)
 
             #try:
-            basesub, fitsub, final_curve, area = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
-            weighted_off_pol += row['dose']*area*cc
+            result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
+            weighted_off_pol += row['dose']*result['area']*cc
+            result['offline_cc'] = cc
             #except Exception as e:
             #    print("Error in weighted full offline sum", e)
             #    weighted_off_pol = 0
             weight += row['dose']
             print("Finished event", index, datetime.now())
+            results[row['stop_dt']] = row
+            results[row['stop_dt']]['result'] = result
         charge_avg_on = weighted_on_pol/weight if weight>0 else 0
         charge_avg_off_cc = weighted_off_cc_pol/weight if weight>0 else 0
         charge_avg_off = weighted_off_pol/weight if weight>0 else 0
         run_dose = weight
-        print("run dose:", run, run_dose / 1E12)
-        print("Finished run", datetime.now())
+        print("Finished run", datetime.now(), "run dose:", run, run_dose / 1E12)
         out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\n")
 
+        # Write full results to dataframe and pickle
+        df = pd.DataFrame.from_dict(results, orient='index')
+        df.sort_index()
+        df.to_pickle('offline_results.pkl')
 
 if __name__ == '__main__':
     main()

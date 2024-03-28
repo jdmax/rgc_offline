@@ -18,14 +18,15 @@ def area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range):
         sum_range: list of 2 numbers 0 to 1 defining sum range
 
     Returns:
-        curve used, area
+        curves used, area
     """
 
-    basesub = standard_baseline(phase, basesweep)
-    fit, fitsub = poly_fit_sub(basesub, freq_list, wings, poly)
-    final_curve, area = signal_sum_range(fitsub, sum_range)
+    result = {}
+    result['basesub'] = standard_baseline(phase, basesweep)
+    result['polyfit'], result['fitsub'] = poly_fit_sub(result['basesub'], freq_list, wings, poly)
+    result['final_curve'], result['area'] = signal_sum_range(result['fitsub'], sum_range)
 
-    return basesub, fitsub, final_curve, area
+    return result
 
 
 def peak_fit_signal_analysis(freq_list, phase, basesweep, wings, poly, params):
@@ -43,12 +44,12 @@ def peak_fit_signal_analysis(freq_list, phase, basesweep, wings, poly, params):
     Returns:
         curve used, polarization
     """
+    result = {}
+    result['basesub'] = standard_baseline(phase, basesweep)
+    result['polyfit'], result['fitsub'] = poly_fit_sub(result['basesub'], freq_list, wings, poly)
+    result['fit'], result['pol'], result['cc'] = d_fit(result['fitsub'], freq_list, params)
 
-    basesub = standard_baseline(phase, basesweep)
-    fit, fitsub = poly_fit_sub(basesub, freq_list, wings, poly)
-    fit, pol, cc = d_fit(fitsub, freq_list, params)
-
-    return basesub, fitsub, fit, pol, cc
+    return result
 
 
 def standard_baseline(phase, basesweep):  # pass event.phase and base_event.basesweep

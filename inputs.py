@@ -16,7 +16,7 @@ def load_settings():
        config_dict = yaml.load(f, Loader=yaml.FullLoader)
     with open('per_run_overrides.yaml') as f:                           # Load settings from YAML files
        override_dict = yaml.load(f, Loader=yaml.FullLoader)
-    return config_dict['settings'], override_dict['defaults'], override_dict['runs']
+    return config_dict['settings'], override_dict['options'], override_dict['runs']
 
 def read_bcms(settings):
     """Read Inputs files, choosing between scaler_calc1 and IPM2C21A based on value, return dict keyed on datetime"""
