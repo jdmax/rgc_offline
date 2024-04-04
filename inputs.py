@@ -95,11 +95,14 @@ def get_events(settings):
     utc = tz.gettz('UTC')
     filename_regex = re.compile(
         '(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
-    #all_files = glob.glob(f"{settings['proton_data_dir']}/*.txt") \
-    #            + glob.glob(f"{settings['deuteron_data_dir']}/*.txt")
-    all_files = glob.glob(f"{settings['sample_data_dir']}/*.txt")
+    all_files = glob.glob(f"{settings['proton_data_dir']}/*.txt") \
+                + glob.glob(f"{settings['deuteron_data_dir']}/*.txt")
+    #all_files = glob.glob(f"{settings['sample_data_dir']}/*.txt")
     events = {}
     print("Loading events", datetime.now())
+
+    # list of keys to include in metadata pickle
+    meta_keys = ['num','channel', 'stop_stamp', 'base_stamp', 'pol', 'area']
 
     if os.path.isfile('event.pkl'):         # if already in pickle, return that, otherwise read from file
         df = pd.read_pickle('event.pkl')
@@ -115,13 +118,38 @@ def get_events(settings):
                     #for key in list(event.keys()):   # reducing data size by removing lists
                     #    if isinstance(event[key], list):
                     #        del event[key]
-                    event['start_dt'] = parser.parse(event['start_time']).replace(tzinfo=utc)
-                    event['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
-                    events[event['stop_dt']] = event
-        print("Entering to dataframe")
+
+                    meta = {key: event[key] for key in meta_keys}
+                    try:
+                        meta['label'] = event['label']
+                    except KeyError:
+                        meta['label'] = 'None'
+                    meta['start_dt'] = parser.parse(event['start_time']).replace(tzinfo=utc)
+                    meta['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
+                    meta['eventfile'] = eventfile
+                    events[meta['stop_dt']] = meta
+        print("Entering metadata to dataframe")
         df = pd.DataFrame.from_dict(events, orient='index')
         print("Done filling")
         df.sort_index()
         df.to_pickle('event.pkl')
     return df
 
+def eventfile_to_df(eventfile):
+    '''Reads given event file and return it as dataframe indexed on stop datetime'''
+
+    eastern = tz.gettz('US/Eastern')
+    utc = tz.gettz('UTC')
+
+    print('Loading', eventfile, "to dataframe")
+    events = {}
+    with open(eventfile, 'r') as f:
+        for line in f:
+            event = json.loads(line)
+            #print(event['settings']['analysis'])
+            event['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
+            events[event['stop_dt']] = event
+
+    df = pd.DataFrame.from_dict(events, orient='index')
+    df.sort_index()
+    return df

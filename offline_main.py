@@ -3,6 +3,7 @@ from dateutil import tz, parser
 import numpy as np
 import pandas as pd
 
+
 import inputs
 import analysis
 
@@ -28,7 +29,7 @@ def main():
             if str(number) in runs:
                 chosen_runs[str(number)] = runs[str(number)]
                 runs[str(number)]['override'] = start
-    events = inputs.get_events(settings)  # dataframe index on datetime
+    events = inputs.get_events(settings)  # dataframe index on datetime  - only metadata in the pickle!
     events = events.sort_index()
     #moller_runs = read_mollers()   # keyed on dt, value is pol
     #scatter_runs = read_scattering() # keyed on run number, value is pol
@@ -37,10 +38,11 @@ def main():
     out = open('run_offline.txt', 'w')
     out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
 
-    results = {}
-
+    current_eventfile = ''
+    results_meta = {}
     for run in sorted(chosen_runs.keys()):   # loop on runs, get dose for this run
         #if '16243' not in run: continue
+        results = {}
         print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
         try:
             selected = events.loc[str(runs[run]['start_time']):str(runs[run]['stop_time'])]
@@ -61,9 +63,15 @@ def main():
 
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events, run analysis for each event
-            # row is event dict
+            # row is event metadata dict
             #print(row)
             sum_charge = 0
+
+            # load eventfile to dataframe if needed
+            if not row['eventfile'] in current_eventfile:
+                event_df = inputs.eventfile_to_df(row['eventfile'])  # dataframe indexed on stop datetime
+                current_eventfile = row['eventfile']
+
             begin = row['start_dt']
             end = row['stop_dt']
             include_bcms = bcms.loc[str(begin):str(end)]
@@ -83,18 +91,27 @@ def main():
             #print("event dose:",index, row['dose']/1E12)
             weighted_on_pol += row['dose']*row['pol']
             try:
-                weighted_off_cc_pol += row['dose']*row['area']*ccs[run]
+                cc = ccs[run]
+            except KeyError:
+                print('No CC entry for run', run)
+                continue
+            try:
+                weighted_off_cc_pol += row['dose']*row['area']*cc
             except Exception as e:
                 print("Error in weighted offline cc sum", e)
                 weighted_off_pol = 0
 
-            freq_list = np.array(row['freq_list'])
-            phase = np.array(row['phase'])
-            basesweep = np.array(row['basesweep'])
+            freq_list = np.array(event_df.loc[index]['freq_list'])
+            phase = np.array(event_df.loc[index]['phase'])
+            basesweep = np.array(event_df.loc[index]['basesweep'])
 
-            wings = row['settings']['analysis']['wings']
-            sum_range = row['settings']['analysis']['sum_range']
-            cc = ccs[run]
+            try:
+                wings = event_df.loc[index]['settings']['analysis']['wings']
+                sum_range = event_df.loc[index]['settings']['analysis']['sum_range']
+                #print(wings)
+            except KeyError:
+                print("KeyError on ",row['stop_dt'])
+                continue
             type = runs[run]['species']
             if not options['online_defaults']:
                 if 'wings' in overrides[runs[run]['override']]:
@@ -113,15 +130,20 @@ def main():
 
             #try:
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
-            weighted_off_pol += row['dose']*result['area']*cc
+            pol = result['area']*cc
+            weighted_off_pol += row['dose']*pol
             result['offline_cc'] = cc
             #except Exception as e:
             #    print("Error in weighted full offline sum", e)
             #    weighted_off_pol = 0
             weight += row['dose']
             print("Finished event", index, datetime.now())
-            results[row['stop_dt']] = row
+            results[row['stop_dt']] = event_df.loc[index].to_dict()
             results[row['stop_dt']]['result'] = result
+            results_meta[index] = row
+            results_meta[index]['run_number'] = run
+            results_meta[index]['offline_pol'] = pol
+            results_meta[index]['offline_cc'] = cc
         charge_avg_on = weighted_on_pol/weight if weight>0 else 0
         charge_avg_off_cc = weighted_off_cc_pol/weight if weight>0 else 0
         charge_avg_off = weighted_off_pol/weight if weight>0 else 0
@@ -129,10 +151,16 @@ def main():
         print("Finished run", datetime.now(), "run dose:", run, run_dose / 1E12)
         out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\n")
 
-        # Write full results to dataframe and pickle
+
+        # Write run results to dataframe and pickle
         df = pd.DataFrame.from_dict(results, orient='index')
         df.sort_index()
-        df.to_pickle('offline_results.pkl')
+        df.to_pickle('results/results'+run+'.pkl')
+        print('Wrote results for run', run, 'to pickle')
+
+    df = pd.DataFrame.from_dict(results_meta, orient='index')
+    df.sort_index()
+    df.to_pickle('results/result_meta.pkl')
 
 if __name__ == '__main__':
     main()
