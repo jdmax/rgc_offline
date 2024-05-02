@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets
 import sys
 import getopt
 
-from app.gui import MainWindow
+from app.gui_results import MainWindow
 
 def main():
     '''Main executable calls main gui

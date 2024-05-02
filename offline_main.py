@@ -63,7 +63,7 @@ def main():
 
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events, run analysis for each event
-            # row is event metadata dict
+            # row is event metadata dict for that event, index is stop_dt
             #print(row)
             sum_charge = 0
 
@@ -142,6 +142,7 @@ def main():
             results[row['stop_dt']]['result'] = result
             results_meta[index] = row
             results_meta[index]['run_number'] = run
+            results_meta[index]['online_pol'] = row['pol']
             results_meta[index]['offline_pol'] = pol
             results_meta[index]['offline_cc'] = cc
         charge_avg_on = weighted_on_pol/weight if weight>0 else 0

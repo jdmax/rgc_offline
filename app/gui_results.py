@@ -6,6 +6,7 @@ import pyqtgraph as pg
 import datetime
 import glob
 import json
+import os
 import re
 import pytz
 import numpy as np
@@ -13,6 +14,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QHBoxLayout, QVBoxLayout
     QTableView, QAbstractItemView, QAbstractScrollArea, QStackedWidget, QDoubleSpinBox, QDateTimeEdit, QPushButton
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QValidator, QStandardItemModel, QStandardItem
 from PyQt5.QtCore import Qt
+import pandas as pd
 
 class MainWindow(QMainWindow):
     '''
@@ -111,7 +113,7 @@ class HistTab(QWidget):
         # Selection list
         self.event_model = QStandardItemModel()
         self.event_model.setHorizontalHeaderLabels(
-            ['Timestamp', 'Date', 'Time', 'Polarization', 'Sweeps', 'Channel', 'Label'])
+            ['Date', 'Time', 'Online Pol','Offline Pol', 'Sweeps', 'Channel', 'Label'])
 
         self.event_table = QTableView()
         self.event_table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -147,70 +149,46 @@ class HistTab(QWidget):
         self.meta_label = QLabel("Metadata will appear here when an event is selected.")
         self.date_box.layout().addWidget(self.meta_label)
 
+        if os.path.isfile('results/result_meta.pkl'):  # if already in pickle, return that, otherwise read from file
+            self.events = pd.read_pickle('results/result_meta.pkl')  # self.events is meta data dict
+            self.events.sort_index()
+        else:
+            print("No results to read")
+
 
     def range_changed(self):
         '''Update time range of events used. Looks through data directory to pull in required events
         '''
         self.start = self.start_dedit.dateTime().toPyDateTime()
         self.end = self.end_dedit.dateTime().toPyDateTime()
-        self.all_files = glob.glob(f"{self.parent.settings['proton_data_dir']}/*.txt") \
-                         + glob.glob(f"{self.parent.settings['deuteron_data_dir']}/*.txt")
         self.current_time = datetime.datetime.strptime('Jan 1 2000  12:00AM', '%b %d %Y %I:%M%p')
-        self.included = []
-        for file in self.all_files:
-            if 'current' in file or 'baseline' in file:
-                continue
-            else:
-                m = self.filename_regex.search(file)
-                if not m: continue   # skip if we don't match the regex
-                start = m.groups()[0]
-                stop = m.groups()[1]
-                start_dt = datetime.datetime.strptime(start, "%Y-%m-%d_%H-%M-%S")
-                stop_dt = datetime.datetime.strptime(stop, "%Y-%m-%d_%H-%M-%S")
-                if self.start < start_dt < self.end or self.start < stop_dt < self.end:
-                    self.included.append(file)
-        self.all = {}
-        for eventfile in self.included:
-            print('Parsing file:', eventfile)
-            with open(eventfile, 'r') as f:
-                for line in f:
-                    event = json.loads(line)
-                    s = event['stop_time']
-                    line_stoptime = datetime.datetime.strptime(s[:26], '%Y-%m-%d %H:%M:%S.%f')
-                    #utcstamp = str(event['stop_stamp'])
-                    utcstamp = event['stop_stamp']
-                    if self.start < line_stoptime < self.end and 'pol' in event:
-                        self.all[utcstamp] = event    # full dictionary from datafile
-                        self.all[utcstamp]['stop_time'] = line_stoptime    # full dictionary from datafile
+
+        self.included = self.events.loc[str(self.start):str(self.end)]   # events within datetime range
 
         self.event_model.removeRows(0, self.event_model.rowCount())
-        for i, stamp in enumerate(sorted(self.all.keys())):
+        for i, tup in enumerate(self.included.iterrows()):
+            index, row = tup
             try:
                 #dt = parse(self.all[stamp]['stop_time'])
-                dt = self.all[stamp]['stop_time']
+                dt = index
                 time = dt.strftime("%H:%M:%S")
                 date = dt.strftime("%m/%d/%y")
-                self.event_model.setItem(i,0,QStandardItem(str(self.all[stamp]['stop_stamp'])))
-                self.event_model.setItem(i,1,QStandardItem(date))
-                self.event_model.setItem(i,2,QStandardItem(time))
-                self.event_model.setItem(i,3,QStandardItem(f"{self.all[stamp]['pol']:.4f}"))
-                self.event_model.setItem(i,4,QStandardItem(str(self.all[stamp]['sweeps'])))
-                self.event_model.setItem(i,5,QStandardItem(str(self.all[stamp]['channel']['name'])))
-                self.event_model.setItem(i,6,QStandardItem(str(self.all[stamp]['label'])))
+                self.event_model.setItem(i,0,QStandardItem(date))
+                self.event_model.setItem(i,1,QStandardItem(time))
+                self.event_model.setItem(i,2,QStandardItem(f"{row['online_pol']*100:.4f}"))
+                self.event_model.setItem(i,3,QStandardItem(f"{row['offline_pol']*100:.4f}"))
+                self.event_model.setItem(i,4,QStandardItem(str(row['sweeps'])))
+                self.event_model.setItem(i,5,QStandardItem(str(row['channel'])))
+                self.event_model.setItem(i,6,QStandardItem(str(row['label'])))
             except KeyError:
                 pass
         try:
-            graph_data = np.column_stack((list([float(k) for k in sorted(self.all.keys())]),[float(self.all[k]['pol']) for k in sorted(self.all.keys())]))
+            graph_data = np.column_stack((list([float(k) for k,row in self.included.iterrows()]),[float(self.included[k]['pol']) for k,row in self.included.iterrows()]))
             self.strip_plot.setData(graph_data)
         except KeyError:
             pass
 
         self.parent.te_tab.update_events(self.all)
-
-        with open("recent_plot.txt", "w") as f:
-            for i, stamp in enumerate(sorted(self.all.keys())):
-                name = 0 if 'NIDAQ' in self.all[stamp]['channel']['name'] else 1
-                f.write(f"{self.all[stamp]['stop_stamp']}\t{self.all[stamp]['area']}\t{name}\n")
 
 
     def select_event(self, item):

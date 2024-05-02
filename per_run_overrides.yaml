@@ -2,7 +2,7 @@
 # Offline analysis per run overrides
 options:
   results_method: poly_fit_range    # options are poly_fit_range or d_fit
-  online_defaults: False # If true, uses online analysis paramters as defaults
+  online_defaults: False # If true, uses online analysis parameters as defaults
   defaults-p:
     wings: # default bounds for fit wings, must be four numbers between 0 and 1
       - 0.01

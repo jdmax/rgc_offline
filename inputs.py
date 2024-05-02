@@ -124,6 +124,8 @@ def get_events(settings):
                         meta['label'] = event['label']
                     except KeyError:
                         meta['label'] = 'None'
+                    meta['channel'] = event['channel']['name']
+                    meta['sweeps'] = event['sweeps']
                     meta['start_dt'] = parser.parse(event['start_time']).replace(tzinfo=utc)
                     meta['stop_dt'] = parser.parse(event['stop_time']).replace(tzinfo=utc)
                     meta['eventfile'] = eventfile
