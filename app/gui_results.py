@@ -16,6 +16,8 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator, QValidator, QStandardIt
 from PyQt5.QtCore import Qt
 import pandas as pd
 
+import inputs
+
 class MainWindow(QMainWindow):
     '''
     '''
@@ -69,6 +71,8 @@ class HistTab(QWidget):
 
         pg.setConfigOption('background', 'w')
         pg.setConfigOption('foreground', 'k')
+
+        self.eventfile = ''
 
 
         self.base_pen = pg.mkPen(color=(180, 0, 0), width=2)
@@ -131,7 +135,8 @@ class HistTab(QWidget):
         self.strip_wid = pg.PlotWidget(title='Range Polarization History', axisItems={'bottom': self.time_axis})
         self.strip_wid.showGrid(True, True)
         self.strip_wid.addLegend(offset=(0.5, 0))
-        self.strip_plot = self.strip_wid.plot([], [], pen=self.base2_pen, name='Polarization')
+        self.strip_plot = self.strip_wid.plot([], [], pen=self.base2_pen, name='Online Polarization')
+        self.strip_off_plot = self.strip_wid.plot([], [], pen=self.base_pen, name='Offline Polarization')
         self.right.addWidget(self.strip_wid)
 
         self.sig_wid = pg.PlotWidget(title='Selected Signal')
@@ -162,12 +167,12 @@ class HistTab(QWidget):
         self.start = self.start_dedit.dateTime().toPyDateTime()
         self.end = self.end_dedit.dateTime().toPyDateTime()
         self.current_time = datetime.datetime.strptime('Jan 1 2000  12:00AM', '%b %d %Y %I:%M%p')
-
         self.included = self.events.loc[str(self.start):str(self.end)]   # events within datetime range
-
         self.event_model.removeRows(0, self.event_model.rowCount())
+        self.row_to_dt = []
         for i, tup in enumerate(self.included.iterrows()):
             index, row = tup
+            self.row_to_dt.append(index)
             try:
                 #dt = parse(self.all[stamp]['stop_time'])
                 dt = index
@@ -183,29 +188,46 @@ class HistTab(QWidget):
             except KeyError:
                 pass
         try:
-            graph_data = np.column_stack((list([float(k) for k,row in self.included.iterrows()]),[float(self.included[k]['pol']) for k,row in self.included.iterrows()]))
+            graph_data = np.column_stack((list([k.timestamp() for k,row in self.included.iterrows()]),
+                                          [float(row['online_pol']) for k,row in self.included.iterrows()]))
+            graph_data2 = np.column_stack((list([k.timestamp() for k, row in self.included.iterrows()]),
+                                          [float(row['offline_pol']) for k, row in self.included.iterrows()]))
+
             self.strip_plot.setData(graph_data)
+            self.strip_off_plot.setData(graph_data2)
         except KeyError:
+            print("Key error")
             pass
 
-        self.parent.te_tab.update_events(self.all)
+        #self.parent.te_tab.update_events(self.all)
 
 
     def select_event(self, item):
+        "Item in list clicked"
         self.update_event_plot(item)
 
     def update_event_plot(self, item):
         '''Update event plot.
         '''
-        stamp = float(self.event_model.data(self.event_model.index(item.row(), 0)))
-        freq_list = np.array(self.all[stamp]['freq_list'])
-        phase = np.array(self.all[stamp]['phase'])
-        sub = np.array(self.all[stamp]['basesub'])
-        fin = np.array(self.all[stamp]['fitsub'])
+        dt = self.row_to_dt[int(self.event_table.currentIndex().row())]
+        print(self.row_to_dt)
+        print(dt)
+        meta = self.included.loc[dt]
+
+        if not meta['eventfile'] in self.eventfile:
+            event_df = inputs.eventfile_to_df(meta['eventfile'])  # dataframe indexed on stop datetime
+            self.eventfile = meta['eventfile']
+
+        event = event_df.loc[dt]
+
+        freq_list = np.array(event['freq_list'])
+        phase = np.array(event['phase'])
+        sub = np.array(event['basesub'])
+        fin = np.array(event['fitsub'])
         self.raw_plot.setData(freq_list,phase-phase.max())
         self.sub_plot.setData(freq_list,sub-sub.max())
         self.fin_plot.setData(freq_list,fin)
 
-        text = "Local time: " + self.all[stamp]['stop_time'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S")
-        text += f"\t{self.all[stamp]['diode_vout']}"
-        self.meta_label.setText(text)
+        #text = "Local time: " + self.all[stamp]['stop_time'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S")
+        #text += f"\t{self.all[stamp]['diode_vout']}"
+        #self.meta_label.setText(text)
