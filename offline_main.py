@@ -91,7 +91,8 @@ def main():
             #print("event dose:",index, row['dose']/1E12)
             weighted_on_pol += row['dose']*row['pol']
             try:
-                cc = ccs[run]
+                # cc = ccs[run] # This was first run offline cc
+                cc = overrides[runs[run]['override']]['cc']
             except KeyError:
                 print('No CC entry for run', run)
                 continue
@@ -99,7 +100,7 @@ def main():
                 weighted_off_cc_pol += row['dose']*row['area']*cc
             except Exception as e:
                 print("Error in weighted offline cc sum", e)
-                weighted_off_pol = 0
+                weighted_off_cc_pol = 0
 
             freq_list = np.array(event_df.loc[index]['freq_list'])
             phase = np.array(event_df.loc[index]['phase'])
@@ -131,12 +132,14 @@ def main():
             #try:
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
             pol = result['area']*cc
+            print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
             weighted_off_pol += row['dose']*pol
+            weight += row['dose']
             result['offline_cc'] = cc
+
             #except Exception as e:
             #    print("Error in weighted full offline sum", e)
             #    weighted_off_pol = 0
-            weight += row['dose']
             print("Finished event", index, datetime.now())
             results[row['stop_dt']] = event_df.loc[index].to_dict()
             results[row['stop_dt']]['result'] = result

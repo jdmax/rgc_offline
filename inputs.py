@@ -14,7 +14,7 @@ def load_settings():
 
     with open('config.yaml') as f:                           # Load settings from YAML files
        config_dict = yaml.load(f, Loader=yaml.FullLoader)
-    with open('per_run_overrides.yaml') as f:                           # Load settings from YAML files
+    with open('per_run_overrides.yaml') as f:
        override_dict = yaml.load(f, Loader=yaml.FullLoader)
     return config_dict['settings'], override_dict['options'], override_dict['runs']
 

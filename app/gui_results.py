@@ -81,6 +81,7 @@ class HistTab(QWidget):
         self.sub_pen = pg.mkPen(color=(220, 0, 0), width=2)
         self.sub2_pen = pg.mkPen(color=(0, 0, 150), width=2)
         self.sub3_pen = pg.mkPen(color=(0, 180, 0), width=2)
+        self.sub4_pen = pg.mkPen(color=(180, 180, 0), width=2)
 
         self.filename_regex = re.compile(
             '(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})__(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}).txt')
@@ -139,12 +140,13 @@ class HistTab(QWidget):
         self.strip_off_plot = self.strip_wid.plot([], [], pen=self.base_pen, name='Offline Polarization')
         self.right.addWidget(self.strip_wid)
 
-        self.sig_wid = pg.PlotWidget(title='Selected Signal')
+        self.sig_wid = pg.PlotWidget(title='Selected Signal Offline Analysis')
         self.sig_wid.showGrid(True, True)
+        self.sig_wid.addLegend(offset=(0.5, 0))
         self.raw_plot = self.sig_wid.plot([], [], pen=self.sub_pen, name='Raw')
         self.sub_plot = self.sig_wid.plot([], [], pen=self.sub2_pen, name='Base Subtracted')
+        self.poly_plot = self.sig_wid.plot([], [], pen=self.sub4_pen, name='Polynomial Fit')
         self.fin_plot = self.sig_wid.plot([], [], pen=self.sub3_pen, name='Fit Subtracted')
-        self.sig_wid.addLegend(offset=(0.5, 0))
         self.right.addWidget(self.sig_wid)
 
 
@@ -214,18 +216,20 @@ class HistTab(QWidget):
         print(dt)
         meta = self.included.loc[dt]
 
-        if not meta['eventfile'] in self.eventfile:
-            event_df = inputs.eventfile_to_df(meta['eventfile'])  # dataframe indexed on stop datetime
-            self.eventfile = meta['eventfile']
+        if not meta['run_number'] in self.eventfile:  # if already in pickle, return that, otherwise read from file
+            df = pd.read_pickle(f'results/results{meta["run_number"]}.pkl')
+            df.sort_index()
 
-        event = event_df.loc[dt]
+        event = df.loc[dt]
 
         freq_list = np.array(event['freq_list'])
         phase = np.array(event['phase'])
-        sub = np.array(event['basesub'])
-        fin = np.array(event['fitsub'])
+        sub = np.array(event['result']['basesub'])
+        poly = np.array(event['result']['polyfit'])
+        fin = np.array(event['result']['fitsub'])
         self.raw_plot.setData(freq_list,phase-phase.max())
         self.sub_plot.setData(freq_list,sub-sub.max())
+        self.poly_plot.setData(freq_list,poly-poly.max())
         self.fin_plot.setData(freq_list,fin)
 
         #text = "Local time: " + self.all[stamp]['stop_time'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S")
