@@ -70,10 +70,12 @@ def poly_fit_sub(basesub, freq_list, wings, poly): # pass event.: basesub, freq_
     #print(data)
     X = np.array([x for x, y in data])
     Y = np.array([y for x, y in data])
-    pf, pcov = optimize.curve_fit(poly, X, Y, p0=pi)
     try:
+        pf, pcov = optimize.curve_fit(poly, X, Y, p0=pi)
         pstd = np.sqrt(np.diag(pcov))
-    except:
+    except RuntimeError:
+        pf = [0,0,0,0,0,0,0,0,0,0]
+        print("RuntimeError!")
         pass
     fit = poly(freqs, *pf)
     sub = sweep - fit

@@ -156,7 +156,7 @@ class HistTab(QWidget):
         self.meta_label = QLabel("Metadata will appear here when an event is selected.")
         self.date_box.layout().addWidget(self.meta_label)
 
-        if os.path.isfile('results/result_meta.pkl'):  # if already in pickle, return that, otherwise read from file
+        if os.path.isfile('results/result_meta.pkl'):
             self.events = pd.read_pickle('results/result_meta.pkl')  # self.events is meta data dict
             self.events.sort_index()
         else:
@@ -169,7 +169,7 @@ class HistTab(QWidget):
         self.start = self.start_dedit.dateTime().toPyDateTime()
         self.end = self.end_dedit.dateTime().toPyDateTime()
         self.current_time = datetime.datetime.strptime('Jan 1 2000  12:00AM', '%b %d %Y %I:%M%p')
-        self.included = self.events.loc[str(self.start):str(self.end)]   # events within datetime range
+        self.included = self.events.sort_index().loc[str(self.start):str(self.end)]   # events within datetime range
         self.event_model.removeRows(0, self.event_model.rowCount())
         self.row_to_dt = []
         for i, tup in enumerate(self.included.iterrows()):
@@ -212,8 +212,8 @@ class HistTab(QWidget):
         '''Update event plot.
         '''
         dt = self.row_to_dt[int(self.event_table.currentIndex().row())]
-        print(self.row_to_dt)
-        print(dt)
+        #print(self.row_to_dt)
+        #print(dt)
         meta = self.included.loc[dt]
 
         if not meta['run_number'] in self.eventfile:  # if already in pickle, return that, otherwise read from file
