@@ -48,14 +48,14 @@ runs:   # run ranges to apply overrides, key is starting run
   # (3) 6/15/22 (15-2) 14NH3-07-23-2009 on the word file no run numbers 
     # 06/15/2022 12:00 AM to 06/16/2022 12:00 AM
     # wings:
-      - 0.01
-      - 0.43
-      - 0.59
-      - 0.99
+     # - 0.01
+     # - 0.43
+     # - 0.59
+     # - 0.99
     #integration_bounds:
     #  - 0.43
     #  - 0.59
-    cc: -8.137613594
+   # cc: -8.137613594
     # err_cc: 0.560402765
   ############################################
   16137:

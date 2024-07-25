@@ -231,7 +231,11 @@ class HistTab(QWidget):
         self.sub_plot.setData(freq_list,sub-sub.max())
         self.poly_plot.setData(freq_list,poly-poly.max())
         self.fin_plot.setData(freq_list,fin)
+        #print(event.keys())
+        #print(event['result'].keys())
 
-        #text = "Local time: " + self.all[stamp]['stop_time'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S")
-        #text += f"\t{self.all[stamp]['diode_vout']}"
-        #self.meta_label.setText(text)
+        text = "Local time: " + event['stop_dt'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S") + "\n"
+        text += f"Diode, Phase voltage: \t{event['diode_vout']}\t{event['phase_vout']}" + "\n"
+        text += f"Online CC, polarization :\t{event['cc']}\t{event['pol']}" + "\n"
+        text += f"Offline CC, polarization :\t{event['result']['offline_cc']}\t{meta['offline_pol']}" + "\n"
+        self.meta_label.setText(text)
