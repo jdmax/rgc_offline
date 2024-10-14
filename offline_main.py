@@ -74,7 +74,10 @@ def main():
 
             begin = row['start_dt']
             end = row['stop_dt']
-            include_bcms = bcms.loc[str(begin):str(end)]
+            try:
+                include_bcms = bcms.loc[str(begin):str(end)]
+            except KeyError:
+                print("BCM key error at", begin, end)
             previous = 0
             for dt, bcm_row in include_bcms.iterrows():  # do time weighted sum
                 if previous == 0: previous = dt
@@ -90,7 +93,7 @@ def main():
             row['dose'] = sum_charge*e_per_nc/raster_area
             #print("event dose:",index, row['dose']/1E12)
             weighted_on_pol += row['dose']*row['pol']
-            try:
+            try:  # try to set the cc from the overrides file
                 # cc = ccs[run] # This was first run offline cc
                 cc = overrides[runs[run]['override']]['cc']
             except KeyError:
@@ -106,6 +109,8 @@ def main():
             phase = np.array(event_df.loc[index]['phase'])
             basesweep = np.array(event_df.loc[index]['basesweep'])
 
+
+            # Determine options for analysis
             try:
                 wings = event_df.loc[index]['settings']['analysis']['wings']
                 sum_range = event_df.loc[index]['settings']['analysis']['sum_range']
@@ -129,7 +134,7 @@ def main():
                     cc = options['defaults-'+type]['cc']
             poly = analysis.poly3  # default is third order
 
-            #try:
+            # Do actual singal analysis on event
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
             pol = result['area']*cc
             print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
