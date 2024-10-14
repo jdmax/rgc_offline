@@ -78,6 +78,7 @@ def main():
                 include_bcms = bcms.loc[str(begin):str(end)]
             except KeyError:
                 print("BCM key error at", begin, end)
+                continue
             previous = 0
             for dt, bcm_row in include_bcms.iterrows():  # do time weighted sum
                 if previous == 0: previous = dt
