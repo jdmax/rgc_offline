@@ -71,7 +71,7 @@ class TETab(QWidget):
         self.calc_box.layout().addWidget(self.fitselect_label)
 
         self.te_model = QStandardItemModel()
-        self.te_model.setHorizontalHeaderLabels(['Timestamp','Date/Time', 'Area', 'Temp (K)'])
+        self.te_model.setHorizontalHeaderLabels(['Timestamp','Date/Time', 'Area', 'Temp (K)', "RF Power (mV)"])
         self.te_table = QTableView()
         self.te_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.te_table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -185,6 +185,7 @@ class TETab(QWidget):
                 self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
             else:
                 self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['status']['TGT:PT12:VaporPressure_T']:.8f}"))
+            self.te_model.setItem(i, 4, QStandardItem(f"{self.hist_points[stamp]['channel']['power']:.10f}"))
 
     def double_clicked(self, item):
         '''Remove event from table when double clicked'''
@@ -198,6 +199,7 @@ class TETab(QWidget):
                 self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['epics']['TGT:PT12:VaporPressure_T']:.8f}"))
             else:
                 self.te_model.setItem(i, 3, QStandardItem(f"{self.hist_points[stamp]['status']['TGT:PT12:VaporPressure_T']:.8f}"))
+            self.te_model.setItem(i, 4, QStandardItem(f"{self.hist_points[stamp]['channel']['power']:.10f}"))
 
     def update_events(self, events):
         self.hist_points = events

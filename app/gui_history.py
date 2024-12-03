@@ -109,6 +109,7 @@ class HistTab(QWidget):
     def range_changed(self):
         '''Update time range of events used. Looks through data directory to pull in required events
         '''
+        i = 0
         self.start = self.start_dedit.dateTime().toPyDateTime()
         self.end = self.end_dedit.dateTime().toPyDateTime()
         self.all_files = glob.glob(f"{self.parent.settings['proton_data_dir']}/*.txt") \
@@ -143,6 +144,7 @@ class HistTab(QWidget):
 
         self.event_model.removeRows(0, self.event_model.rowCount())
         for i, stamp in enumerate(sorted(self.all.keys())):
+            i+=1
             try:
                 #dt = parse(self.all[stamp]['stop_time'])
                 dt = self.all[stamp]['stop_time']
@@ -162,7 +164,7 @@ class HistTab(QWidget):
             self.strip_plot.setData(graph_data)
         except KeyError:
             pass
-
+        print("Total number of events", i)
         self.parent.te_tab.update_events(self.all)
 
         with open("recent_plot.txt", "w") as f:
