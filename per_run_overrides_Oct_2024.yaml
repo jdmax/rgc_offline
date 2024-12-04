@@ -1,0 +1,572 @@
+# J. Maxwell, 2024, Pushpa Panday, Ishara Fernando, Devin Seay, Jordan Daniel
+# Offline analysis per run overrides
+options:
+  results_method: poly_fit_range    # options are poly_fit_range or d_fit
+  online_defaults: False # If true, uses online analysis parameters as defaults
+  defaults-p:
+    wings: # default bounds for fit wings, must be four numbers between 0 and 1
+      - 0.01
+      - 0.3
+      - 0.7
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.3
+      - 0.7
+  defaults-d:
+    wings: # default bounds for fit wings, must be four numbers between 0 and 1
+      - 0.01
+      - 0.22
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.22
+      - 0.75
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.03
+      G: -0.00003
+      # r: 1.2    r is determined as -.9 or 1.1 depending on the sign of the signal
+      wQ: 0.027
+      wL: 32.69
+      eta: -0.02
+      xi: -0.001
+runs:   # run ranges to apply overrides, key is starting run
+### NH3 from UVA (Ishara, Devin, Jay) #####
+##  03/07/2024: proton ~ 5 Lambda/2, will give an estimate on inductance and capacitance (James)
+  16062:
+    end: 16078
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range:
+      - 0
+      - 1
+    cc : -6.4281
+    # err_cc : 0.5644
+  ############################################
+  # (3) 6/15/22 (15-2) 14NH3-07-23-2009 on the word file no run numbers 
+    # 06/15/2022 12:00 AM to 06/16/2022 12:00 AM
+    # wings:
+     # - 0.01
+     # - 0.43
+     # - 0.59
+     # - 0.99
+    #integration_bounds:
+    #  - 0.43
+    #  - 0.59
+   # cc: -8.137613594
+    # err_cc: 0.560402765
+  ############################################
+  16137:
+    end: 16178
+    # 06/19/2022 02:00 PM to 06/20/2022 03:00 PM
+    wings:
+      - 0.01
+      - 0.43
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.43
+    #  - 0.59
+    cc: -5.331795305
+    # err_cc: 0.3575145
+  ############################################
+  16211:
+    end: 16260
+    # 07/01/2022 10:25 AM to 07/02/2022 07:00 AM
+    wings:
+      - 0.01
+      - 0.43
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.43
+    #  - 0.59
+    cc: -4.0012767
+    # err_cc: 0.3933636
+  ############################################
+  16317:
+    end: 16333
+    # 07/14/2022 10:25 AM to 07/15/2022 07:00 AM
+    wings:
+      - 0.01
+      - 0.43
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.43
+    #  - 0.59
+    cc: -10.89297096
+    # err_cc: 0.527871218
+  ############################################
+  16650:
+    end: 16695
+    # 08/11/2022 12:00 AM to 08/12/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.44
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.44
+    #  - 0.59
+    cc: -3.6677374
+    # err_cc: 0.2013612
+  ############################################
+  16704:
+    end: 16706
+  # Note in the google doc only the starting run number was written and it was 16706
+    # 08/16/2022 10:00 AM to 08/17/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.44
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.44
+    #  - 0.59
+    cc: -3.7365152
+    # err_cc: 0.1686143
+  ############################################
+  16742:
+    end: 16752
+  # No data available
+  ############################################
+  16753:
+    end: 167778
+  # No data available
+  ############################################
+  16982:
+    end: 16993
+    # 09/14/2022 10:00 AM to 09/15/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.44
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.44
+    #  - 0.59
+    cc: -1.6170467
+    # err_cc: 0.0217755
+  ############################################
+  16995:
+    end: 17032
+    # 09/16/2022 to 09/20/2022:Same as above (no TE taken) 09/14/2022 10:00 AM to 09/15/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.44
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.44
+    #  - 0.59
+    cc: -1.6170467
+    # err_cc: 0.0217755
+  ############################################
+  17067:
+    end: 17102
+    # 09/23/2022 to 09/29/2022: Same as above (no TE taken) 09/14/2022 10:00 AM to 09/15/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.44
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.44
+    #  - 0.59
+    cc: -1.6170467
+    # err_cc: 0.0217755
+  ############################################
+  17144:
+    end: 17161
+  # 10/04/2022 to 10/11/2022: No data available
+  ############################################
+  17162:
+    end: 17169
+  # 10/11/2022 to 10/12/2022: No data available
+  ############################################
+  17185:
+    end: 17214
+    # 10/14/2022 10:00 AM to 10/17/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.59
+    cc: -2.6964037
+    # err_cc: 0.0908419
+  ############################################
+  17215:
+    end: 17225
+    # 10/17/2022 10:00 AM to 10/19/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.59
+    cc: -2.1838472
+    # err_cc: 0.0820692
+  ############################################
+  17351:
+    end: 17368
+    # 11/02/2022 12:00 AM to 11/03/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.59
+    cc: -1.887734997
+    # err_cc: 0.035658786
+  ############################################
+  17370:
+    end: 17383
+    # 11/05/2022 to 11/08/2022: Same as above (no TE taken) 11/02/2022 12:00 AM to 11/03/2022 12:00 AM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.59
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.59
+    cc: -1.887734997
+    # err_cc: 0.035658786
+  ############################################
+  17574:
+    end: 17598
+    # 02/14/2023 12:00 AM to 02/15/2023 12:00 AM considered up to 17598 (originally 17597)
+    wings:
+      - 0.01
+      - 0.42
+      - 0.64
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.64
+    cc: -3.211401709
+    # err_cc: 0.270069845
+  ############################################
+  17599:
+    end: 17621
+  # 02/17/2023 to 02/20/2023: No data available, can only see an enhanced signal.
+  ############################################
+  17709:
+    end: 17741
+    # 03/06/2023 8:00 AM to 03/09/2023 10:00 AM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.64
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.64
+    cc: -4.73384537
+    # err_cc: 0.371772584
+  ############################################
+  17748:
+    end: 17762
+    # 03/10/2023 12:00 PM to 03/12/2023 04:00 PM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.64
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.64
+    cc: -5.9485318
+    # err_cc: 0.6578788
+  ############################################
+  17769:
+    end: 17778
+    # 03/13/2023 01:00 PM to 03/15/2023 10:00 AM : Same as above (no TE taken) 03/10/2023 12:00 PM to 03/12/2023 04:00 PM
+    wings:
+      - 0.01
+      - 0.42
+      - 0.64
+      - 0.99
+    #integration_bounds:
+    #  - 0.42
+    #  - 0.64
+    cc: -5.9485318
+    # err_cc: 0.6578788
+
+### ND3 from UVA (Ishara, Devin, Jay) #####
+  16401: # 07/21/22 21:01 to 07/24/22 14:39
+    end: 16432
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -14.85400417
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.068141667
+      G: -0.00003
+      r: 1.82985
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.174795833
+  16465: # 7/28/22 11:00 am to 8/01/22 11 am
+    end: 16495
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -2.4687
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0866
+      G: -0.00003
+      r: 0.8672
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0974
+  16498: #  08/01/22 09:50 am to 8/08/22 10:42 am
+    end: 16611
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -8.70565
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.072034615
+      G: -0.00003
+      r: 1.816473077
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.144046154
+  16615: # 08/08/22 10:45 am to 8/11/22 08:00 am
+    end: 16636
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -2.939307692
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.086
+      G: -0.00003
+      r: 0.870769231
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.109153846
+  16882: # 09/06/22 22:23 to 09/07/22 00:49
+    end: 16902
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.450431818
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.078540909
+      G: -0.00003
+      r: 1.89375
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: 0.023363636
+  16923: # 9/9/22 19:10 pm to 9/11/22 1:30 pm
+    end: 16944
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.553766667
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0745
+      G: -0.00003
+      r: 0.594233333
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0523
+  16945:  # 09/11/22 15:38 to 09/13/22 14:26
+    end: 16968
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.509433333
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.08
+      G: -0.00003
+      r: 0.584583333
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.016916667
+  17039:  # 9/20/22 10:15 am to 9/22/22 8pm
+    end: 17057
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.54952
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.078
+      G: -0.00003
+      r: 2.157
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: 0.0077
+  17058:  # 9/22/22 09:55 pm to 9/23/22 2:50 pm
+    end: 17065
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.56138
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0767
+      G: -0.00003
+      r: 0.57725
+      wQ: 0.027
+      wL: 32.685
+      eta: -0.02
+      xi: -0.03495
+  17227:  # 10/19/22 10:00 am to 10/22/22 09:00 pm
+    end: 17263
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.516638889
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0778
+      G: -0.00003
+      r: 2.013022222
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: 0.027683333
+  17264:  # 10/22/22 10:30 pm to 10/27/22 12:00 pm
+    end: 17296
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.601155556
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0825
+      G: -0.00003
+      r: 0.600372222
+      wQ: 0.027
+      wL: 32.679
+      eta: -0.02
+      xi: -0.0077
+  17491:  # 02/01/23 10:15 am to 02/05/23 2:30 pm
+    end: 17513
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.643842
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.07711
+      G: -0.00003
+      r: 2.02433
+      wQ: 0.027
+      wL: 32.698
+      eta: -0.02
+      xi: 0.0042
+  17523:  # 02/06/23 03:40 pm to 02/10/23 9:30 am
+    end: 17542
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.620626429
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.077157143
+      G: -0.00003
+      r: 0.556042857
+      wQ: 0.027
+      wL: 32.698
+      eta: -0.02
+      xi: -0.013242857
+  17544:  # 02/10/23 10:00 am to 02/13/23 10:30 am
+    end: 17560
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.691567308
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0833
+      G: -0.00003
+      r: 0.602330769
+      wQ: 0.027
+      wL: 32.698
+      eta: -0.02
+      xi: -0.018807692
+  17650:  # 02/24/23 11:00 am to 02/27/23 11:50 am
+    end: 17667
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.514441667
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0795
+      G: -0.00003
+      r: 0.584833333
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: -0.010283333
+  17678:  # 03/01/23 10:38 am to 03/03/23 02:00 pm
+    end: 17686
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.969773333
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.07665
+      G: -0.00003
+      r: 2.24675
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: 0.00785
+  17687:  # 03/03/23 02:40 pm to 03/06/23 11:00 am
+    end: 17703
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.746685714
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.081928571
+      G: -0.00003
+      r: 1.874764286
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: 0.014042857
+  17780:  # 03/15/23 10:30 am to 03/17/23 11:00 am
+    end: 17791
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.755041667
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.0765
+      G: -0.00003
+      r: 2.14075
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: 0.019533333
+  17792:  # 03/17/23 11:40 am to 03/19/23 09:30 am
+    end: 17804
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.736009091
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.082
+      G: -0.00003
+      r: 0.576909091
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: -0.016909091
