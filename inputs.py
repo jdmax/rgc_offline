@@ -64,12 +64,13 @@ def read_runs(settings):
                 entry = {}
                 date, run, start, stop, cell = match
                 entry['cell'] = cell
-                entry['start_time'] = parser.parse(date+" "+start).replace(tzinfo=eastern)
-                if start.split(":")[0] > stop.split(":")[0]:     # handle runs that end on next day
-                    dt = parser.parse(date+" "+stop).replace(tzinfo=eastern)
+                entry['start_time'] = parser.parse(date+" "+start+" EST", tzinfos={"EST": tz.gettz("America/New_York")})
+                if float(start.split(":")[0]) > float(stop.split(":")[0]):     # handle runs that end on next day
+                    dt = parser.parse(date+" "+stop+" EST", tzinfos={"EST": tz.gettz("America/New_York")})
                     entry['stop_time'] = dt + timedelta(days=1)
+                    print("Splitting date",date,start.split(":")[0],stop.split(":")[0])
                 else:
-                    entry['stop_time'] = parser.parse(date+" "+stop).replace(tzinfo=eastern)
+                    entry['stop_time'] = parser.parse(date+" "+stop+" EST", tzinfos={"EST": tz.gettz("America/New_York")})
                 entry['species'] = 'p' if 'H' in file else 'd'
                 runs[run] = entry
     return runs

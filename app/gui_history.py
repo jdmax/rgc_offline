@@ -126,7 +126,7 @@ class HistTab(QWidget):
                 stop = m.groups()[1]
                 start_dt = datetime.datetime.strptime(start, "%Y-%m-%d_%H-%M-%S")
                 stop_dt = datetime.datetime.strptime(stop, "%Y-%m-%d_%H-%M-%S")
-                if self.start < start_dt < self.end or self.start < stop_dt < self.end:
+                if self.start < start_dt < self.end or self.start < stop_dt < self.end or start_dt < self.start < stop_dt:
                     self.included.append(file)
         self.all = {}
         for eventfile in self.included:

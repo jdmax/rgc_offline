@@ -40,14 +40,19 @@ def main():
 
     current_eventfile = ''
     results_meta = {}
+
+    with open('range_debug.txt', 'w') as f:
+        select = events.loc["2022-07-01 00:0:00.000+0000":"2022-08-01 00:0:00.000+0000"]
+        for x,y in select.iterrows():
+            f.write(f"{x}\n")
     for run in sorted(chosen_runs.keys()):   # loop on runs, get dose for this run
         #if '16243' not in run: continue
         results = {}
-        print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
+        print("Run", run, runs[run]['start_time'].isoformat(), runs[run]['stop_time'].isoformat())
         try:
-            selected = events.loc[str(runs[run]['start_time']):str(runs[run]['stop_time'])]
+            selected = events.loc[runs[run]['start_time'].isoformat():runs[run]['stop_time'].isoformat()]
         except ValueError:
-            print('ValueError:', str(runs[run]['start_time']), str(runs[run]['stop_time']))
+            print('ValueError:', runs[run]['start_time'].isoformat(), runs[run]['stop_time'].isoformat())
         #print(selected)
         if '20' in runs[run]['cell']:
             raster_area = np.pi*0.9*0.9  # assuming 18mm raster
@@ -60,6 +65,7 @@ def main():
         weighted_off_cc_pol = 0  # online with offline calibration
         weighted_off_pol = 0
         weight = 0
+
 
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events, run analysis for each event
@@ -135,7 +141,7 @@ def main():
                     cc = options['defaults-'+type]['cc']
             poly = analysis.poly3  # default is third order
 
-            # Do actual singal analysis on event
+            # Do actual signal analysis on event
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
             pol = result['area']*cc
             print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
