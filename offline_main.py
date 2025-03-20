@@ -36,23 +36,19 @@ def main():
     print("Finished loads", datetime.now())
 
     out = open('run_offline.txt', 'w')
-    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
+    #out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
+    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\tcc_on\tcc_off\tpol_on\tpol_off\n")
 
     current_eventfile = ''
     results_meta = {}
-
-    with open('range_debug.txt', 'w') as f:
-        select = events.loc["2022-07-01 00:0:00.000+0000":"2022-08-01 00:0:00.000+0000"]
-        for x,y in select.iterrows():
-            f.write(f"{x}\n")
     for run in sorted(chosen_runs.keys()):   # loop on runs, get dose for this run
         #if '16243' not in run: continue
         results = {}
-        print("Run", run, runs[run]['start_time'].isoformat(), runs[run]['stop_time'].isoformat())
+        print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
         try:
-            selected = events.loc[runs[run]['start_time'].isoformat():runs[run]['stop_time'].isoformat()]
+            selected = events.loc[str(runs[run]['start_time']):str(runs[run]['stop_time'])]
         except ValueError:
-            print('ValueError:', runs[run]['start_time'].isoformat(), runs[run]['stop_time'].isoformat())
+            print('ValueError:', str(runs[run]['start_time']), str(runs[run]['stop_time']))
         #print(selected)
         if '20' in runs[run]['cell']:
             raster_area = np.pi*0.9*0.9  # assuming 18mm raster
@@ -65,7 +61,6 @@ def main():
         weighted_off_cc_pol = 0  # online with offline calibration
         weighted_off_pol = 0
         weight = 0
-
 
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events, run analysis for each event
@@ -99,6 +94,8 @@ def main():
 
             row['dose'] = sum_charge*e_per_nc/raster_area
             #print("event dose:",index, row['dose']/1E12)
+            on_pol = row['pol']
+            on_cc = row['pol']/row['area']
             weighted_on_pol += row['dose']*row['pol']
             try:  # try to set the cc from the overrides file
                 # cc = ccs[run] # This was first run offline cc
@@ -115,7 +112,7 @@ def main():
             freq_list = np.array(event_df.loc[index]['freq_list'])
             phase = np.array(event_df.loc[index]['phase'])
             basesweep = np.array(event_df.loc[index]['basesweep'])
-
+            off_cc = cc
 
             # Determine options for analysis
             try:
@@ -141,7 +138,7 @@ def main():
                     cc = options['defaults-'+type]['cc']
             poly = analysis.poly3  # default is third order
 
-            # Do actual signal analysis on event
+            # Do actual singal analysis on event
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
             pol = result['area']*cc
             print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
@@ -165,7 +162,8 @@ def main():
         charge_avg_off = weighted_off_pol/weight if weight>0 else 0
         run_dose = weight
         print("Finished run", datetime.now(), "run dose:", run, run_dose / 1E12)
-        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\n")
+        #out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\n")
+        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{on_pol:.4f}\t{pol:.4f}\n")
 
 
         # Write run results to dataframe and pickle
