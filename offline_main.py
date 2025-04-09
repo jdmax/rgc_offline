@@ -36,13 +36,16 @@ def main():
     print("Finished loads", datetime.now())
 
     out = open('run_offline.txt', 'w')
+    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\tcharge_avg_offline_err\trun_dose(Pe/cm2)\tcc_on\tcc_off\tcc_off_err\tpol_on\tpol_off\tpol_off_err\tpol_off_m2\tpol_off_m2_err\n")
     #out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
-    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\tcc_on\tcc_off\tpol_on\tpol_off\n")
+ #  out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\tcc_on\tcc_off\tcc_off_err\tpol_on\tpol_off\tpol_off_err\n")
 
     current_eventfile = ''
     results_meta = {}
     for run in sorted(chosen_runs.keys()):   # loop on runs, get dose for this run
-        #if '16243' not in run: continue
+        # Use the following two lines to check any individual run
+        # if run != '16768':
+        #     continue
         results = {}
         print("Run", run, runs[run]['start_time'], runs[run]['stop_time'])
         try:
@@ -61,6 +64,15 @@ def main():
         weighted_off_cc_pol = 0  # online with offline calibration
         weighted_off_pol = 0
         weight = 0
+
+        on_pol_array = []
+        off_pol_array = []
+        off_pol_err_sqrd_array = []
+
+        # full pol. uncertainty with uncorrelated error from each event
+        weighted_off_pol_method2 = 0
+        weighted_inverse_sigma2  = 0
+        off_charge_avgd_pol_sum = 0
 
         # Charge average pol per run
         for index, row in selected.iterrows():  # loop through selected events, run analysis for each event
@@ -95,6 +107,9 @@ def main():
             row['dose'] = sum_charge*e_per_nc/raster_area
             #print("event dose:",index, row['dose']/1E12)
             on_pol = row['pol']
+            on_pol_array.append(on_pol)
+            
+            #print(on_pol)
             on_cc = row['pol']/row['area']
             weighted_on_pol += row['dose']*row['pol']
             try:  # try to set the cc from the overrides file
@@ -103,6 +118,13 @@ def main():
             except KeyError:
                 print('No CC entry for run', run)
                 continue
+            ## added on 03/24/2025 ##
+            # Extract cc_err from overrides 
+            try:
+                cc_err = overrides[runs[run]['override']]['cc_err']
+            except KeyError:
+                print('No CC error entry for run', run)
+                cc_err = 0  # Default to zero if not found
             try:
                 weighted_off_cc_pol += row['dose']*row['area']*cc
             except Exception as e:
@@ -138,13 +160,32 @@ def main():
                     cc = options['defaults-'+type]['cc']
             poly = analysis.poly3  # default is third order
 
+
             # Do actual singal analysis on event
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
+            ## added on 03/24/2025 ##
+            #print(result['area'])
+            # Compute standard deviation of area for error propagation
+            sigma_area = np.std(result['area'])
+            # Compute the uncertainty on pol
+            # sigma_pol = np.sqrt((sigma_area * cc) ** 2 + (cc_err * result['area']) ** 2)
+            sigma_pol_sqrd = (sigma_area * cc) ** 2 + (cc_err * result['area']) ** 2
+            off_pol_err_sqrd_array.append(sigma_pol_sqrd)
+            # print("**** Sigma of offline avg pol***")
+            # print(sigma_pol)
+            # print("************************")
+            #############################
             pol = result['area']*cc
+            off_pol_array.append(pol)
+            
             print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
             weighted_off_pol += row['dose']*pol
             weight += row['dose']
             result['offline_cc'] = cc
+
+            weighted_off_pol_method2 += pol/sigma_pol_sqrd
+            weighted_inverse_sigma2 += 1/sigma_pol_sqrd
+            off_charge_avgd_pol_sum +=  row['dose']* row['dose']*sigma_pol_sqrd
 
             #except Exception as e:
             #    print("Error in weighted full offline sum", e)
@@ -160,13 +201,46 @@ def main():
         charge_avg_on = weighted_on_pol/weight if weight>0 else 0
         charge_avg_off_cc = weighted_off_cc_pol/weight if weight>0 else 0
         charge_avg_off = weighted_off_pol/weight if weight>0 else 0
+        charge_avg_off_err = np.sqrt(off_charge_avgd_pol_sum)/weight if weight>0 else 0
+
         run_dose = weight
+        on_pol_array = np.array(on_pol_array)
+        off_pol_array = np.array(off_pol_array)
+        off_pol_err_sqrd_array = np.array(off_pol_err_sqrd_array)
+
+        # avg_on_pol = np.mean(on_pol_array)
+        # avg_off_pol = np.mean(off_pol_array)
+        # avg_off_pol_err = np.sqrt(np.sum(off_pol_err_sqrd_array)) / len(off_pol_err_sqrd_array)
+        # avg_off_pol_err = np.sqrt(np.sum(off_pol_err_sqrd_array)) / len(off_pol_err_sqrd_array)
+
+        # This is to avoid zero (or 10^-4 or 10^-5) scale values when taking the mean.
+        # If you don't want to do that, comment the following lines 206-213 with 222, then uncomment 199-202 with 223
+        threshold = 1e-3
+        filtered_on_pol = on_pol_array[abs(on_pol_array) >= threshold]
+        filtered_off_pol = off_pol_array[abs(off_pol_array) >= threshold]
+        filtered_off_pol_err_sqrd_array = off_pol_err_sqrd_array[abs(off_pol_err_sqrd_array) >= threshold]
+        avg_on_pol = np.mean(filtered_on_pol) if filtered_on_pol.size > 0 else np.nan
+        avg_off_pol = np.mean(filtered_off_pol) if filtered_off_pol.size > 0 else np.nan
+        avg_off_pol_std = np.std(filtered_off_pol) if filtered_off_pol.size > 0 else np.nan
+        avg_off_pol_err = np.sqrt(np.sum(filtered_off_pol_err_sqrd_array)) / len(filtered_off_pol_err_sqrd_array)
+
+
+        off_pol_method2 = weighted_off_pol_method2/weighted_inverse_sigma2 if weighted_inverse_sigma2>0 else 0
+        off_pol_method2_err = 1/np.sqrt(weighted_inverse_sigma2)
+
+        # Some print statements for testing
+        # print(len(on_pol_array))
+        # print(on_pol_array)
+        # print(len(off_pol_array))
+        # print(off_pol_array)
+        # print(off_pol_err_sqrd_array)
         print("Finished run", datetime.now(), "run dose:", run, run_dose / 1E12)
-        #out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\n")
-        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{on_pol:.4f}\t{pol:.4f}\n")
+        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{charge_avg_off_err:.6f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_std:.6f}\t{off_pol_method2:.4f}\t{off_pol_method2_err:.6f}\n")
+  #     out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_std:.6f}\n")
+        # out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_err:.6f}\n")
 
 
-        # Write run results to dataframe and pickle
+        # # Write run results to dataframe and pickle
         df = pd.DataFrame.from_dict(results, orient='index')
         df.sort_index()
         df.to_pickle('results/results'+run+'.pkl')
