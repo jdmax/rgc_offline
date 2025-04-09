@@ -16,8 +16,6 @@
 7/11/22	16289	11:08	12:27	20-5	+75	1
 '''Break''' for C,CH2, empty, and NH3
 Date	Run #	Run Start Time	Run End Time	Cell Type	Pol/Pol type from RCDB when runs ends	HWP
-7/19/22	16358	12:49	15:10	20-5	+27	1
-7/19/22	16359	15:25	17:08	20-5	?	1
 7/19/22	16360	17:16	17:29	20-5	?	1
 7/19/22	16361	17:33	17:49	20-5	?	1
 7/19/22	16362	17:53	19:01	20-5	?	1
