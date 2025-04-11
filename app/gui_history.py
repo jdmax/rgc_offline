@@ -189,7 +189,8 @@ class HistTab(QWidget):
         self.fin_plot.setData(freq_list,fin)
 
         text = "Local time: " + self.all[stamp]['stop_time'].replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y, %H:%M:%S")
-        text += f"\t{self.all[stamp]['diode_vout']}"
+        #text += f"\t{self.all[stamp]['diode_vout']}"
+        text += f", uWave Freq: \t{self.all[stamp]['uwave_freq']}"
         self.meta_label.setText(text)
 
 
