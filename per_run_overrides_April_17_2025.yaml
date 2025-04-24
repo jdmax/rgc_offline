@@ -1,0 +1,867 @@
+# James Maxwell, Pushpa Panday, Ishara Fernando, Devin Seay, Jordan Daniel
+# Offline analysis per run overrides
+options:
+  results_method: poly_fit_range    # options are poly_fit_range or d_fit
+  online_defaults: False # If true, uses online analysis parameters as defaults
+  defaults-p:
+    wings: # default bounds for fit wings, must be four numbers between 0 and 1
+      - 0.01
+      - 0.3
+      - 0.7
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.3
+      - 0.7
+  defaults-d:
+    wings: # default bounds for fit wings, must be four numbers between 0 and 1
+      - 0.01
+      - 0.22
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.22
+      - 0.75
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.03
+      G: -0.00003
+      # r: 1.2    r is determined as -.9 or 1.1 depending on the sign of the signal
+      wQ: 0.027
+      wL: 32.69
+      eta: -0.02
+      xi: -0.001
+runs:   # run ranges to apply overrides, key is starting run
+### NH3 Final #####
+##  03/07/2024: proton ~ 5 Lambda/2, will give an estimate on inductance and capacitance (James)
+  ###############################
+  # P01 online CC was -9.1267122
+  16062:
+    end: 16078
+    wings:
+      - 0.01
+      - 0.42
+      - 0.61
+      - 0.99
+    sum_range:
+      - 0.42
+      - 0.61
+    cc: -9.6057
+    cc_err: 0.46775
+  ###############################
+  # P02 online CC was -5.246731
+  16137:
+    end: 16178
+    wings:
+      - 0.01
+      - 0.46
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.46
+      - 0.60
+    cc: -5.204
+    cc_err: 0.1361
+  ###############################
+  # P03 online CC was -3.666499
+  16211:
+    end: 16260
+    wings:
+      - 0.01
+      - 0.45
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.45
+      - 0.60
+    cc: -3.6582
+    cc_err: 0.11075
+  ###############################
+  # P04 online CC was -3.701902
+  16317:
+    end: 16357
+    wings:
+      - 0.01
+      - 0.43
+      - 0.59
+      - 0.99
+    sum_range:
+      - 0.43
+      - 0.59
+    cc: -3.8164
+    # cc: -10.8929
+    cc_err: 0.5278
+  ###############################
+  # P05 online CC was -3.738274
+  16650:
+    end: 16695
+    wings:
+      - 0.01
+      - 0.45
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.45
+      - 0.60
+    cc: -3.8164
+    cc_err: 0.06385
+  ###############################
+  # P06 online CC was -3.673815
+  16704:
+    end: 16738
+    wings:
+      - 0.01
+      - 0.45
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.45
+      - 0.60
+    cc: -3.77485
+    cc_err: 0.04815
+  ###############################
+  # P07 online CC was -3.673815 # No TE was taken
+  16742:
+    end: 16773
+    wings:
+      - 0.01
+      - 0.45
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.45
+      - 0.60
+    cc: -3.77485
+    cc_err: 0.04815
+  ###############################
+  # P08 online CC was -1.626101
+  16982:
+    end: 16995
+    wings:
+      - 0.01
+      - 0.42
+      - 0.68
+      - 0.99
+    sum_range:
+      - 0.42
+      - 0.68
+    cc: -1.62395
+    cc_err: 0.01565
+  ###############################
+  # P09 online CC was -1.626101 # No TE was taken
+  16995:
+    end: 17032
+    wings:
+      - 0.01
+      - 0.42
+      - 0.68
+      - 0.99
+    sum_range:
+      - 0.42
+      - 0.68
+    cc: -1.62395
+    cc_err: 0.01565
+  ###############################
+  # P10 online CC was -1.39
+  17067:
+    end: 17102
+    wings:
+      - 0.01
+      - 0.45
+      - 0.63
+      - 0.99
+    sum_range:
+      - 0.45
+      - 0.63
+    cc: -1.7413
+    cc_err: 0.0328
+  ###############################
+  # P11 online CC was -1.39 # No TE was taken
+  17144:
+    end: 17169
+    wings:
+      - 0.01
+      - 0.45
+      - 0.63
+      - 0.99
+    sum_range:
+      - 0.45
+      - 0.63
+    cc: -1.7413
+    cc_err: 0.0328
+  ###############################
+  # P12 online CC was -1.594777
+  17185:
+    end: 17225
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -1.767
+    cc_err: 0.03005
+  ###############################
+  # P13 online CC was -1.594777 
+  17351:
+    end: 17368
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -1.7209
+    cc_err: 0.02135
+  ###############################
+  # P14 online CC was -1.755435 # No TE was taken
+  17371:
+    end: 17383
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -1.7209
+    cc_err: 0.02135
+  ###############################
+  # P15 online CC was -2.545784
+  17574:
+    end: 17597
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -2.78625
+    cc_err: 0.1662
+  ###############################
+  # P16 online CC was -2.545784 # No TE was taken
+  17598:
+    end: 17621
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -2.78625
+    cc_err: 0.1662
+  ###############################
+  # P17 online CC was -3.173865
+  17720:
+    end: 17741
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -3.38215
+    cc_err: 0.1553
+  ###############################
+  # P18 online CC was -4.5
+  17748:
+    end: 17762
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    cc: -5.543
+    cc_err: 0.7624
+  ###############################
+  # P19 online CC was -4.5 # No TE was taken
+  17769:
+    end: 17778
+    wings:
+      - 0.01
+      - 0.40
+      - 0.60
+      - 0.99
+    sum_range:
+      - 0.40
+      - 0.60
+    #cc: -0.031526017183108185
+    cc: -5.543
+    cc_err: 0.7624
+
+###########################################
+############# ND3 Final ###################
+###########################################
+
+#  ###############################
+#  # D01 online CC was -14.5
+#  #16401: # 07/21/22 21:01 to 07/24/22 14:39
+#  16277: # 07/21/22 21:01 to 07/24/22 14:39
+#    #end: 16432
+#    end: 16463
+#    wings:
+#      - 0.01
+#      - 0.25
+#      - 0.75
+#      - 0.99
+#    sum_range: # default bounds for range integration option
+#      - 0.25
+#      - 0.75
+#    cc: -14.4
+#    #cc_err: 0.1294017867
+#    d_fit_params: # parameters for Dulya fits
+#      A: 0.07086 # A_err: 0.000964
+#      G: -0.00003
+#      r: 1.8157 #r_err: 0.0125 
+#      wQ: 0.027
+#      wL: 32.682
+#      eta: -0.02
+#      xi: -0.0183 # xi_err: 0.007
+  ###############################
+  # D01a 
+  16263: #
+    end: 16273
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -17.658
+    #cc: -9.63
+    cc_err: 0.1294017867
+    d_fit_params: # parameters for Dulya fits
+      A: 0.07086 # A_err: 0.000964
+      G: -0.00003
+      r: 1.8157 #r_err: 0.0125
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0183 # xi_err: 0.007
+  ###############################
+  # D01b
+  16277: #
+    end: 16283
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    #cc: -17.658
+    cc: -9.63
+    cc_err: 0.1294017867
+    d_fit_params: # parameters for Dulya fits
+      A: 0.07086 # A_err: 0.000964
+      G: -0.00003
+      r: 1.8157 #r_err: 0.0125
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0183 # xi_err: 0.007
+  ###############################
+  # D01c
+  16284: #
+    end: 16289
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    #cc: -17.658
+    cc: -16.972
+    cc_err: 0.1294017867
+    d_fit_params: # parameters for Dulya fits
+      A: 0.07086 # A_err: 0.000964
+      G: -0.00003
+      r: 1.8157 #r_err: 0.0125
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0183 # xi_err: 0.007
+  ###############################
+  # D01d
+  16358: #
+    end: 16362
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    #cc: -17.658
+    cc: -5.608
+    cc_err: 0.1294017867
+    d_fit_params: # parameters for Dulya fits
+      A: 0.07086 # A_err: 0.000964
+      G: -0.00003
+      r: 1.8157 #r_err: 0.0125
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0183 # xi_err: 0.007
+  ###############################
+  ###############################
+  ###############################
+  # D01a online CC was -14.5
+  # 16263: #
+  #   end: 16289
+  #   wings:
+  #     - 0.01
+  #     - 0.25
+  #     - 0.75
+  #     - 0.99
+  #   sum_range: # default bounds for range integration option
+  #     - 0.25
+  #     - 0.75
+  #   cc: -14.4
+  #   #cc_err: 0.1294017867
+  #   d_fit_params: # parameters for Dulya fits
+  #     A: 0.07086 # A_err: 0.000964
+  #     G: -0.00003
+  #     r: 1.8157 #r_err: 0.0125
+  #     wQ: 0.027
+  #     wL: 32.682
+  #     eta: -0.02
+  #     xi: -0.0183 # xi_err: 0.007
+  # ###############################
+  # D01b online CC was -14.5
+  16401: #
+    end: 16463
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -13.03
+    cc_err: 0.1294017867
+    d_fit_params: # parameters for Dulya fits
+      A: 0.07086 # A_err: 0.000964
+      G: -0.00003
+      r: 1.8157 #r_err: 0.0125
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.0183 # xi_err: 0.007
+  # ###############################
+  # D02 online CC was -14.5
+  16465: # 7/28/22 11:00 am to 8/01/22 11 am
+    end: 16495
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.348
+    # cc: -3.1489
+    cc_err: 0.1937942272
+    d_fit_params: # parameters for Dulya fits
+      A: 0.08628 # A_err: 0.000902
+      G: -0.00003
+      r: 0.857 # r_err: 0.00761
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.09661 # xi_err: 0.0074
+  ###############################
+  # D03 online CC was -14.5
+  16498: #  08/01/22 09:50 am to 8/08/22 10:42 am
+    end: 16611
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -9.2923
+    cc_err: 0.1297702682
+    d_fit_params: # parameters for Dulya fits
+      A: 0.07062 # A_err: 0.00074
+      G: -0.00003
+      r: 1.8727 # r_err: 0.01642
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.1504 # xi_err: 0.024
+  ###############################
+  # D04 online CC was -14.5
+  16615: # 08/08/22 10:45 am to 8/11/22 08:00 am
+    end: 16636
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.077275
+    cc_err: 0.2004438052
+    d_fit_params: # parameters for Dulya fits
+      A: 0.08195 # A_err: 0.00128
+      G: -0.00003
+      r: 0.8584 # r_err: 0.00585
+      wQ: 0.027
+      wL: 32.682
+      eta: -0.02
+      xi: -0.104 # xi_err: 0.00647
+  ###############################
+  # D05 online CC was -1.34
+  16882: # 09/06/22 22:23 to 09/07/22 00:49
+    #end: 16902
+    end: 16922
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.4538
+    cc_err: 0.002350765833
+    d_fit_params: # parameters for Dulya fits
+      A: 0.078 # A_err: 0.001
+      G: -0.00003
+      r: 1.8983 # r_err: 0.0038
+      wQ: 0.027
+      wL: 32.685
+      eta: -0.02
+      xi: 0.02266 # xi_err: 0.00123
+  ###############################
+  # D06 online CC was -1.41
+  16923: # 9/9/22 19:10 pm to 9/11/22 1:30 pm 
+    end: 16944
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.435265
+    cc_err: 0.00266890544
+    d_fit_params: # parameters for Dulya fits
+      A: 0.0829 # A_err: 0.00044
+      G: -0.00003
+      r: 0.6097 # r_err: 0.00531
+      wQ: 0.027
+      wL: 32.685
+      eta: -0.02
+      xi: -0.0115 # xi_err: -0.0015
+  ###############################
+  # D07 online CC was -1.41
+  16945:  # 09/11/22 15:38 to 09/13/22 14:26
+    end: 16968
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.45282
+    cc_err: 0.006066689789
+    d_fit_params: # parameters for Dulya fits
+      A: 0.08095 # A_err: 0.000218
+      G: -0.00003
+      r: 0.5887 # r_err: 0.0018
+      wQ: 0.027
+      wL: 32.685
+      eta: -0.02
+      xi: -0.015 # xi_err: 0.0017
+  ###############################
+  # D08 online CC was -1.57
+  17039:  # 9/20/22 10:15 am to 9/22/22 8pm
+    end: 17057
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.50051
+    cc_err: 0.002065499697
+    d_fit_params: # parameters for Dulya fits
+      A: 0.08295 # A_err: 0.000218
+      G: -0.00003
+      r: 2.0204 # r_err: 0.018
+      wQ: 0.027
+      wL: 32.685
+      eta: -0.02
+      xi: 0.0174 # xi_err: 0.0027
+  ###############################
+  # D09 online CC was -1.39
+  17058:  # 9/22/22 09:55 pm to 9/23/22 2:50 pm
+    end: 17065
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.51594
+    cc_err: 0.01625884336
+    d_fit_params: # parameters for Dulya fits
+      A: 0.0829 #A_err: 0.0003
+      G: -0.00003
+      r: 0.5761 # r_err: 0.0015
+      wQ: 0.027
+      wL: 32.685
+      eta: -0.02
+      xi: -0.0087 # xi_err: 0.0019
+  ###############################
+  # D10 online CC was -1.42
+  17227:  # 10/19/22 10:00 am to 10/22/22 09:00 pm
+    end: 17263
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.49332
+    cc_err: 0.0256488991
+    d_fit_params: # parameters for Dulya fits
+      A: 0.078 # A_err: 0.00022
+      G: -0.00003
+      r: 2.1636 # r_err: 0.0202
+      wQ: 0.027
+      wL: 32.679
+      eta: -0.02
+      xi: 0.0088 # xi_err: 0.0008
+  ###############################
+  # D11 online CC was -1.42
+  17264:  # 10/22/22 10:30 pm to 10/27/22 12:00 pm
+    end: 17296
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -1.5590775
+    cc_err: 0.005869814733
+    d_fit_params: # parameters for Dulya fits
+      A: 0.084 # A_err: 0.00032
+      G: -0.00003
+      r: 0.6141 # r_err: 0.0027
+      wQ: 0.027
+      wL: 32.679
+      eta: -0.02
+      xi: -0.0176 # xi_err: 0.0017
+  ###############################
+  # D12 online CC was -3.37
+  17491:  # 02/01/23 10:15 am to 02/05/23 2:30 pm
+    end: 17513
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.60392
+    cc_err: 0.02059712905
+    d_fit_params: # parameters for Dulya fits
+      A: 0.0767 # A_err: 0.00056
+      G: -0.00003
+      r: 2.1149 # r_err: 0.0227
+      wQ: 0.027
+      wL: 32.698
+      eta: -0.02
+      xi: -0.0037 # xi_err: 0.0045
+  ###############################
+  # D13 online CC was -3.65
+  17523:  # 02/06/23 03:40 pm to 02/10/23 9:30 am
+    end: 17542
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.6430475
+    cc_err: 0.04247295286
+    d_fit_params: # initial parameters for Dulya fits
+      A: 0.07685 # A_err: 0.00047
+      G: -0.00003
+      r: 0.527 # r_err: 0.0023
+      wQ: 0.027
+      wL: 32.698
+      eta: -0.02
+      xi: -0.0169 # xi_err: 0.0022
+  ###############################
+  # D14 online CC was -3.65
+  17544:  # 02/10/23 10:00 am to 02/13/23 10:30 am
+    end: 17560
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.6875325
+    cc_err: 0.02982628623
+    d_fit_params: # parameters for Dulya fits
+      A: 0.08457 # A_err: 0.00051
+      G: -0.00003
+      r: 0.6118 # r_err: 0.0029
+      wQ: 0.027
+      wL: 32.698
+      eta: -0.02
+      xi: -0.0216 # xi_err: 0.0045
+  ###############################
+  # D15 online CC was -3.65
+  17650:  # 02/24/23 11:00 am to 02/27/23 11:50 am
+    end: 17667
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.53572
+    cc_err: 0.007995812967
+    d_fit_params: # parameters for Dulya fits
+      A: 0.079 # A_err: 0.000218
+      G: -0.00003
+      r: 0.587 # r_err: 0.0017
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: -0.0089 # x_err: 0.0019
+  ###############################
+  # D16 online CC was -3.93
+  17678:  # 03/01/23 10:38 am to 03/03/23 02:00 pm
+    end: 17686
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.9768875
+    cc_err: 0.0295098886
+    d_fit_params: # parameters for Dulya fits
+      A: 0.0765 # A_err: 0.00059
+      G: -0.00003
+      r: 2.2177 # r_err: 0.0141
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: 0.0092 # xi_err: 0.0031
+  ###############################
+  # D17 online CC was -3.93
+  17687:  # 03/03/23 02:40 pm to 03/06/23 11:00 am
+    end: 17703
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.7565925
+    cc_err: 0.01485846897
+    d_fit_params: # parameters for Dulya fits
+      A: 0.0805 # A_err: 0.00051
+      G: -0.00003
+      r: 1.9425 # r_err: 0.00598
+      wQ: 0.027
+      wL: 32.696
+      eta: -0.02
+      xi: 0.0125 # xi_err: 0.00216
+  ###############################
+  # D18 online CC was -3.67
+  17780:  # 03/15/23 10:30 am to 03/17/23 11:00 am
+    end: 17791
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.77452
+    cc_err: 0.01519826388
+    d_fit_params: # parameters for Dulya fits
+      A: 0.0778 # A_err: 0.00051
+      G: -0.00003
+      r: 1.9474 # r_err: 0.0597
+      wQ: 0.027
+      wL: 32.677
+      eta: -0.02
+      xi: 0.0156 # xi_err: 0.0036
+  ###############################
+  # D19 online CC was -3.67
+  17792:  # 03/17/23 11:40 am to 03/19/23 09:30 am
+    end: 17804
+    wings:
+      - 0.01
+      - 0.25
+      - 0.75
+      - 0.99
+    sum_range: # default bounds for range integration option
+      - 0.25
+      - 0.75
+    cc: -3.7730275
+    cc_err: 0.006775
+    d_fit_params: # parameters for Dulya fits
+      A: 0.082
+      G: -0.00003
+      r: 0.578
+      wQ: 0.027
+      wL: 32.677
+      eta: -0.02
+      xi: -0.018
