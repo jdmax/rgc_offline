@@ -67,8 +67,11 @@ Extracting calibration constants differs between proton (NH₃) and deuteron (ND
 1. Run the script main.py.
 
 2. In the **History tab**, identify the dedicated TE measurements that occurred before or after the polarization period. During TE, the polarization value should be nearly steady (below 0.5%) with minor fluctuations. Ideally, select one TE measurement before and one after polarization to minimize uncertainty in the calibration constant (CC).
+![historytab](https://github.com/user-attachments/assets/ed0b782e-ca5b-407a-92b2-2616a3f203ed)
 
 3. Go to the **Calibration tab** and use the **Area vs Time** panel to select a time range where polarization is steady.
+![calibrationtab](https://github.com/user-attachments/assets/f677598b-586c-4e89-9e24-983c54426fc9)
+
 
 4. In the **Select for TE** panel (middle green graph), select a vertical range that results in a nearly horizontal fitted line. Aim for 15–20 data points in the left-hand table.
 
@@ -77,6 +80,8 @@ Extracting calibration constants differs between proton (NH₃) and deuteron (ND
    a. Click the data point to load the corresponding signal in the bottom panel. If the signal is not clearly visible, zoom in on the Y-axis using your mouse scroll wheel. If no signal is visible even after zooming (Y scale ~10⁻⁶), double-click to remove that point from the table.
 
    b. Go to the **Analysis tab** and adjust the fit boundaries to highlight the wings touching the signal. Record the fit boundaries.
+   ![analysistab](https://github.com/user-attachments/assets/3488cf1b-375f-49de-b192-999c7194ac58)
+
 
    c. Use the Integrate within Range option to include the signal region. Record the **Area** from the Results panel and the **Temperature** from the Calibration tab.
 
@@ -97,8 +102,10 @@ Extracting calibration constants differs between proton (NH₃) and deuteron (ND
 ### Procedure for Deuteron (ND₃)
 
 1. Since no dedicated TE data is available, use the **History tab** to identify regions of interest—look for “golden events” after a swap or anneal, particularly after achieving maximum polarization and entering a steady phase.
+ ![ND3_HistoryTab](https://github.com/user-attachments/assets/b647f107-ac58-440d-8442-ef235afc4a19)
 
 2. In the **Calibration tab**, use the **Area vs Time** panel to select a steady polarization region.
+![ND3_CalibrationTab](https://github.com/user-attachments/assets/59855994-ffc7-44bb-875f-60ca93cc3312)
 
 3. In the **Select for TE** panel, define a range that produces a nearly horizontal fit line. Ensure it includes about 15–20 data points in the left-hand table.
 
@@ -107,12 +114,16 @@ Extracting calibration constants differs between proton (NH₃) and deuteron (ND
    a. Click the point to display its signal in the lower panel. Zoom in if necessary. If no clear deuteron signal (pake-doublet) appears at a Y scale ~10⁻⁵, double-click the point to remove it.
 
    b. Go to the **Analysis tab** and set the fit boundaries to highlight the wings touching the signal. Record the boundaries.
+    ![ND3_AnalysisTab-1](https://github.com/user-attachments/assets/409f1ac1-8d52-4b1d-8301-6f0719338ca8)
+
 
    c. Use Integrate within Range to select the signal region. Record the **Area** and **Temperature**.
 
    d. In the **Analysis tab**, select "Deuteron Peak Fit" from the dropdown in the **Results** panel. This will fit the deuteron signal and display key parameters including CC, Area, and Polarization. Record these.
+   ![ND3_AnalysisTab-2](https://github.com/user-attachments/assets/8ea8dfa7-ebf2-4dc9-b4b0-a1b76346f860)
+
 
    e. Repeat steps (a)–(d) for all data points.
 
-5. Copy all these collected values into a spreadsheet for further analysis.
+6. Copy all these collected values into a spreadsheet for further analysis.
 
