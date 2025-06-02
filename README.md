@@ -1,33 +1,58 @@
-# Instructions for Users
+## Instructions for Users
 
-To run the offline analysis software, you will need access to the experimental data. By default, the software points to the JLab O:\ drive to access the data. If you don't have access to that drive, copy the data locally and specify the location in the config.yaml file. You will need all the data from the `/group/poltar/HallB/RGC/` directories: `data-p`, `data-d`, and `BCM/Mya`. Other metadata can be found in the `inputs` directory within the code.
+To run the offline analysis software, you will need access to the experimental data. By default, the software points to the JLab `O:\` drive to access this data. If you do not have access to that drive, you can copy the data locally and specify the new location in the `config.yaml` file.
 
-## An Introduction to the scripts
+You will need all data from the `/group/poltar/HallB/RGC/` directories:
+- `data-p` (proton data)
+- `data-d` (deuteron data)
+- `BCM/Mya` (beam current monitor and related metadata)
 
-### inputs.py
-This file processes experimental metadata to prepare it for use in the analysis code. The functions in this file run when you execute `offline_main.py`. It reads the BCM exports, run ranges, and event files, creating the `bcm.pkl` and `event.pkl` metadata files that are necessary for subsequent steps.
+Additional metadata can be found in the `inputs/` directory within the code repository.
 
-### main.py
-This is the main GUI for walking through events to perform calibrations. For each calibration period, a calibration constant (CC) must be produced from either TEs (in the case of proton data) or golden events (in the case of deuteron data). While these calibrations are running, thorough notes should be taken documenting the analysis settings used to create each calibration for that period, such as any changes to the fit wings or sum range from the defaults necessary to produce a clean fit.
+---
 
-### per_run_overrides.yaml
-Once the organizational and calibration steps are finished, the end result should be a hand-created `per_run_overrides.yaml` file in the main directory. This file sets options for the signal analysis, first establishing general defaults to apply to every event under the "options" heading. The next section, "runs", breaks down the entire experiment into sets of runs with common calibration settings. For each set of runs, it outlines the differences needed for analysis from the defaults. Each range is named after the starting run of the experiment and contains an "end" entry that specifies the last run in that range. 
+## Overview of Scripts
 
-Typically, a range might have a different set of "wings" (the two areas outside the polarization signal on the q-curve used in the polynomial fit, given from 0 to 1). Ranges might also specify a different `sum_range`, which causes the final integration to occur only in a smaller central section to ignore noise away from the polarization signal. Most importantly, each range needs a "cc" (calibration constant) to convert the area calculated in the code to a polarization value.
+### `inputs.py`
+Processes experimental metadata for analysis. This script runs automatically when executing `offline_main.py`. It reads the BCM exports, run ranges, and event files, producing the `bcm.pkl` and `event.pkl` files required for further analysis.
 
-### offline_main.py
-This is the core of the offline analysis, which takes the metadata for events and calibrations and uses it to analyze each event. It first loads the metadata pickles, then walks through each experimental run. For each run, it selects the NMR events that occurred in that time frame. For each event in the timeframe, it performs signal analysis and loads data from the necessary event file if it isn't already open. The signal analysis uses methods from the `analysis.py` file for each event. Once the signal analysis is complete, results are saved to two files in the `results` directory: a quick-to-read metadata file for all runs called `results_meta.pkl`, and full results pickles for each run named `results[run number].pkl`.
+### `main.py`
+Provides the main GUI to inspect and calibrate events. For each calibration period, a calibration constant (CC) is generated—from either Thermal Equilibrium (TE) data (for proton targets) or golden events (for deuteron targets). While performing calibrations, be sure to document the analysis settings used (e.g., fit wing positions or integration ranges) for reproducibility.
 
-### results_main.py
-Finally, results can be visualized by running `results_main.py`. From here, you can select a date range to plot and select individual events to see how the analysis performed.
+### `per_run_overrides.yaml`
+Defines analysis configurations per run range. This file is created manually after calibration is complete and should be placed in the main directory. It includes:
 
+- An `options` section with default analysis settings applied to all runs.
+- A `runs` section, dividing the experiment into run ranges. Each range (named by its starting run number) can override defaults for signal analysis.  
 
-## Summary of steps in general
+Settings can include:
+- `wings`: Fit boundaries (values from 0 to 1) used in the polynomial fit.
+- `sum_range`: Integration limits for computing signal area.
+- `cc`: Calibration constant used to convert area to polarization.
 
-1. Ensure the location of all necessary files is set in `config.yaml`.
-2. Set all calibration data for each run range in `per_run_overrides.yaml`, using `main.py` to navigate through and perform analysis on the calibration events.
-3. Run `offline_main.py` to perform the full analysis using the calibrations you set.
+### `offline_main.py`
+Performs the full offline signal analysis. It:
+1. Loads the generated metadata (`bcm.pkl`, `event.pkl`).
+2. Iterates over all experimental runs.
+3. For each run, selects corresponding NMR events and performs signal analysis using methods in `analysis.py`.
+4. Saves results in the `results/` directory as:
+   - `results_meta.pkl` (summary metadata for all runs)
+   - `results[run number].pkl` (full results for each run)
+
+### `results_main.py`
+A visualization tool for reviewing analysis outcomes. You can:
+- Select a date range to plot results.
+- Inspect individual events to assess the quality of the analysis.
+
+---
+
+## Summary of Workflow
+
+1. Set the paths to all necessary data in `config.yaml`.
+2. Use `main.py` to calibrate events and define settings in `per_run_overrides.yaml`.
+3. Run `offline_main.py` to analyze all events using your calibration settings.
 4. Run `results_main.py` to visualize the results.
+
 
 ---
 
