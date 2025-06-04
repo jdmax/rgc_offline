@@ -1,4 +1,4 @@
-# RGC Offline Target Polarization
+# RGC Offline Target Polarization Analysis
 
 ## Instructions for Users
 
