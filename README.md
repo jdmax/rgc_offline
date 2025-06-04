@@ -1,3 +1,5 @@
+# RGC Offline Target Polarization
+
 ## Instructions for Users
 
 To run the offline analysis software, you will need access to the experimental data. By default, the software points to the JLab `O:\` drive to access this data. If you do not have access to that drive, you can copy the data locally and specify the new location in the `config.yaml` file.
