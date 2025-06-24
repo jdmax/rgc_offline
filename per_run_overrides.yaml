@@ -12,6 +12,7 @@ options:
     sum_range: # default bounds for range integration option
       - 0.3
       - 0.7
+    ice-correction: 1.45 # Multiplicative CC correction for ice on coil
   defaults-d:
     wings: # default bounds for fit wings, must be four numbers between 0 and 1
       - 0.01

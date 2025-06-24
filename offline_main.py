@@ -36,7 +36,7 @@ def main():
     print("Finished loads", datetime.now())
 
     out = open('run_offline.txt', 'w')
-    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\tcharge_avg_offline_err\trun_dose(Pe/cm2)\tcc_on\tcc_off\tcc_off_err\tpol_on\tpol_off\tpol_off_err\tpol_off_m2\tpol_off_m2_err\n")
+    out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\tcharge_avg_offline_err\tcharge_avg_offline_ice\trun_dose(Pe/cm2)\tcc_on\tcc_off\tcc_off_err\tpol_on\tpol_off\tpol_off_err\tpol_off_m2\tpol_off_m2_err\n")
     #out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\n")
  #  out.write(f"#run\tstart_time\tstop_time\tspecies\tcell\tcharge_avg_online\tcharge_avg_offline_cc\tcharge_avg_offline\trun_dose(Pe/cm2)\tcc_on\tcc_off\tcc_off_err\tpol_on\tpol_off\tpol_off_err\n")
 
@@ -63,6 +63,7 @@ def main():
         weighted_on_pol = 0
         weighted_off_cc_pol = 0  # online with offline calibration
         weighted_off_pol = 0
+        weighted_off_ice_pol = 0
         weight = 0
 
         on_pol_array = []
@@ -118,6 +119,7 @@ def main():
             except KeyError:
                 print('No CC entry for run', run)
                 continue
+
             ## added on 03/24/2025 ##
             # Extract cc_err from overrides 
             try:
@@ -158,10 +160,14 @@ def main():
                     cc = overrides[runs[run]['override']]['cc']
                 else:
                     cc = options['defaults-'+type]['cc']
+                if 'ice-correction' in overrides[runs[run]['override']]:
+                    cc_ice = overrides[runs[run]['override']]['ice-correction']
+                else:
+                    cc_ice = options['defaults-'+type]['ice-correction']
             poly = analysis.poly3  # default is third order
 
 
-            # Do actual singal analysis on event
+            # Do actual signal analysis on event
             result = analysis.area_signal_analysis(freq_list, phase, basesweep, wings, poly, sum_range)
             ## added on 03/24/2025 ##
             #print(result['area'])
@@ -176,12 +182,15 @@ def main():
             # print("************************")
             #############################
             pol = result['area']*cc
+            pol_ice = result['area']*cc_ice
             off_pol_array.append(pol)
             
             print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
             weighted_off_pol += row['dose']*pol
+            weighted_off_ice_pol += row['dose']*pol_ice
             weight += row['dose']
             result['offline_cc'] = cc
+            result['offline_cc_ice'] = cc_ice
 
             weighted_off_pol_method2 += pol/sigma_pol_sqrd
             weighted_inverse_sigma2 += 1/sigma_pol_sqrd
@@ -197,9 +206,11 @@ def main():
             results_meta[index]['run_number'] = run
             results_meta[index]['online_pol'] = row['pol']
             results_meta[index]['offline_pol'] = pol
+            results_meta[index]['offline_pol_ice'] = pol_ice
             results_meta[index]['offline_cc'] = cc
         charge_avg_on = weighted_on_pol/weight if weight>0 else 0
         charge_avg_off_cc = weighted_off_cc_pol/weight if weight>0 else 0
+        charge_avg_off_ice = weighted_off_ice_pol/weight if weight>0 else 0
         charge_avg_off = weighted_off_pol/weight if weight>0 else 0
         charge_avg_off_err = np.sqrt(off_charge_avgd_pol_sum)/weight if weight>0 else 0
 
@@ -235,7 +246,7 @@ def main():
         # print(off_pol_array)
         # print(off_pol_err_sqrd_array)
         print("Finished run", datetime.now(), "run dose:", run, run_dose / 1E12)
-        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{charge_avg_off_err:.6f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_std:.6f}\t{off_pol_method2:.4f}\t{off_pol_method2_err:.6f}\n")
+        out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{charge_avg_off_err:.6f}\t{charge_avg_off_ice:.6f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_std:.6f}\t{off_pol_method2:.4f}\t{off_pol_method2_err:.6f}\n")
   #     out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_std:.6f}\n")
         # out.write(f"{run}\t{runs[run]['start_time']}\t{runs[run]['stop_time']}\t{runs[run]['species']}\t{runs[run]['cell']}\t{charge_avg_on:.4f}\t{charge_avg_off_cc:.4f}\t{charge_avg_off:.4f}\t{run_dose/1E15}\t{on_cc:.4f}\t{off_cc:.4f}\t{cc_err:.4f}\t{avg_on_pol:.4f}\t{avg_off_pol:.4f}\t{avg_off_pol_err:.6f}\n")
 
