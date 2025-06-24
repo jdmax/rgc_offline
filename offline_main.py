@@ -10,7 +10,8 @@ import analysis
 def main():
     """Main analysis loop"""
 
-
+    sum_events = 0
+    sum_sweeps = 0
     e_per_nc = int(6.241e9)  # electrons per nanocoloumb
     eastern = tz.gettz('US/Eastern')
     utc = tz.gettz('UTC')
@@ -109,7 +110,8 @@ def main():
             #print("event dose:",index, row['dose']/1E12)
             on_pol = row['pol']
             on_pol_array.append(on_pol)
-            
+
+
             #print(on_pol)
             on_cc = row['pol']/row['area']
             weighted_on_pol += row['dose']*row['pol']
@@ -184,6 +186,10 @@ def main():
             pol = result['area']*cc
             pol_ice = result['area']*cc_ice
             off_pol_array.append(pol)
+
+
+            sum_sweeps += row['sweeps']
+            sum_events += 1
             
             print(row['area'],result['area'],event_df.loc[index]['cc'],cc)
             weighted_off_pol += row['dose']*pol
@@ -260,6 +266,7 @@ def main():
     df = pd.DataFrame.from_dict(results_meta, orient='index')
     df.sort_index()
     df.to_pickle('results/result_meta.pkl')
+    print("total events, sweeps:", sum_events, sum_sweeps)
 
 if __name__ == '__main__':
     main()

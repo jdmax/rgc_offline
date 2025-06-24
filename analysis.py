@@ -120,7 +120,7 @@ def signal_sum_range(fitsub, sum_range):
 
 
 def d_fit(fitsub, freq_list, params):
-    """Perform Dueteron fit and calculate polarization
+    """Perform Deuteron fit and calculate polarization
 
     Arguments:
         fitsub: poly subtracted signal
