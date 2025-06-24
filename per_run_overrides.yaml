@@ -30,6 +30,7 @@ options:
       wL: 32.69
       eta: -0.02
       xi: -0.001
+    ice-correction: 1 # D doesn't need ice correction
 runs:   # run ranges to apply overrides, key is starting run
 ### NH3 Final #####
 ##  03/07/2024: proton ~ 5 Lambda/2, will give an estimate on inductance and capacitance (James)
@@ -298,7 +299,7 @@ runs:   # run ranges to apply overrides, key is starting run
     sum_range:
       - 0.40
       - 0.60
-    cc: -0.031526017183108185
+    #cc: -0.031526017183108185
     cc: -5.543
     #cc_err: 0.7624
 
